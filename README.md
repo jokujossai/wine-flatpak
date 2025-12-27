@@ -1,0 +1,74 @@
+# Wine Flatpak Games
+
+Custom Flatpak packaging for Windows games using Wine, with gamescope integration for HiDPI scaling.
+
+## Features
+
+- **Modular Architecture**: Custom base runtime with Wine as a separate extension
+- **Gamescope Integration**: Built-in upscaling for old games on modern displays
+- **Simple Configuration**: Games configured via `config.ini`
+- **32-bit Support**: Full multiarch support for old Windows games
+
+## Quick Start
+
+### Build Components (in order)
+
+```bash
+# 1. Base runtime
+cd base/io.github.jokujossai.wine.base
+flatpak-builder --user --install --force-clean build io.github.jokujossai.wine.base.yml
+
+# 2. Wine extension
+cd ../../wine/io.github.jokujossai.wine.Version.wine-10
+flatpak-builder --user --install --force-clean build io.github.jokujossai.wine.Version.wine-10.yml
+
+# 3. (Optional) Gamescope extension
+cd ../../extension/io.github.jokujossai.gamescope
+flatpak-builder --user --install --force-clean build io.github.jokujossai.gamescope.yml
+```
+
+### Build and Run a Game
+
+```bash
+cd game/io.github.jokujossai.wine.minesweeper
+flatpak-builder --user --install --force-clean build io.github.jokujossai.wine.minesweeper.yml
+flatpak run io.github.jokujossai.wine.minesweeper
+```
+
+## Game Configuration
+
+Games use `/app/config.ini`:
+
+```ini
+exe=/app/share/game/game.exe
+installer=/app/share/game/setup.exe
+windows_version=winxp
+output_width=800
+output_height=600
+use_gamescope=1
+```
+
+## Environment Variables
+
+- `USE_GAMESCOPE=0` - Disable gamescope
+- `WINEDEBUG=+all` - Enable Wine debug output
+- `WINE_VERSION=wine-10` - Select Wine version
+
+## Troubleshooting
+
+```bash
+# Check components installed
+flatpak list | grep io.github.jokujossai
+
+# Debug mode
+flatpak run --env=WINEDEBUG=+all io.github.jokujossai.wine.{game}
+
+# Shell access
+flatpak run --devel --command=bash io.github.jokujossai.wine.{game}
+```
+
+## License
+
+MIT License for packaging scripts. See LICENSE for bundled component licenses.
+
+Base manifest structure derived from [org.winehq.Wine](https://github.com/flathub/org.winehq.Wine).

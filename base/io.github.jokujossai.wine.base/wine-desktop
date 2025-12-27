@@ -1,0 +1,87 @@
+#!/bin/bash
+# Wine desktop wrapper - handles gamescope or virtual desktop mode
+# Usage: wine-desktop [-W <width> -H <height>] -- <wine args...>
+
+set -e
+
+WINE_BIN="/app/bin/wine"
+
+# Validate Wine installation
+if [ ! -x "$WINE_BIN" ]; then
+    echo "Error: Wine version ${WINE_VERSION} not found at ${WINE_BIN}"
+    echo "Available versions:"
+    ls -1 /app/wine/ 2>/dev/null || echo "  (none installed)"
+    exit 1
+fi
+
+# Parse width and height arguments (optional)
+GAMESCOPE_ARGS=()
+WIDTH=""
+HEIGHT=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -W)
+            GAMESCOPE_ARGS+=("-W" "$2")
+            WIDTH="$2"
+            shift 2
+            ;;
+        -H)
+            GAMESCOPE_ARGS+=("-H" "$2")
+            HEIGHT="$2"
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: wine-desktop [-W <width> -H <height>] -- <wine args...>"
+            exit 1
+            ;;
+    esac
+done
+
+# Validate width/height pairing - both must be provided or both must be empty
+if [ -n "$WIDTH" ] && [ -z "$HEIGHT" ]; then
+    zenity --error \
+        --title="Virhe" \
+        --text="Leveys määritelty ilman korkeutta.\n\nMääritä molemmat tai jätä molemmat tyhjiksi." \
+        --width=400
+    exit 1
+elif [ -z "$WIDTH" ] && [ -n "$HEIGHT" ]; then
+    zenity --error \
+        --title="Virhe" \
+        --text="Korkeus määritelty ilman leveyttä.\n\nMääritä molemmat tai jätä molemmat tyhjiksi." \
+        --width=400
+    exit 1
+fi
+
+# Check if gamescope should be used (enabled by default, disable with USE_GAMESCOPE=0)
+if [ "${USE_GAMESCOPE:-1}" = "1" ]; then
+    # Try to find gamescope (prefer jokujossai, fallback to vulkan)
+    GAMESCOPE_BIN=""
+
+    if [ -x "/app/extensions/gamescope/bin/gamescope" ]; then
+        GAMESCOPE_BIN="/app/extensions/gamescope/bin/gamescope"
+    elif [ -x "/usr/lib/extensions/vulkan/gamescope/bin/gamescope" ]; then
+        GAMESCOPE_BIN="/usr/lib/extensions/vulkan/gamescope/bin/gamescope"
+    fi
+
+    if [ -n "$GAMESCOPE_BIN" ]; then
+        # Add fullscreen flag if FULLSCREEN=1
+        if [ "${FULLSCREEN:-0}" = "1" ]; then
+            GAMESCOPE_ARGS+=("-f")
+        fi
+        # Launch with gamescope
+        exec "$GAMESCOPE_BIN" "${GAMESCOPE_ARGS[@]}" -- "$WINE_BIN" "$@"
+    fi
+fi
+
+# Fallback: use wine virtual desktop if width/height provided, otherwise run directly
+if [ -n "$WIDTH" ] && [ -n "$HEIGHT" ]; then
+    exec "$WINE_BIN" explorer.exe /desktop=wine-desktop,"${WIDTH}x${HEIGHT}" "$@"
+else
+    exec "$WINE_BIN" "$@"
+fi

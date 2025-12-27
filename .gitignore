@@ -1,0 +1,29 @@
+# Flatpak build directories
+build/
+.flatpak-builder/
+repo/
+
+# Build outputs
+*.flatpak
+*.flatpakref
+
+# Reference directory (research materials, not committed)
+reference/
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code
+.claude/settings.local.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+*.tmp

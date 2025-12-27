@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Minesweeper
+GenericName=Classic Minesweeper
+Comment=Play the classic Windows Minesweeper game
+Icon=io.github.jokujossai.wine.minesweeper
+Exec=minesweeper-launcher
+Terminal=false
+Categories=Game;LogicGame;
+Keywords=minesweeper;windows;wine;puzzle;logic;

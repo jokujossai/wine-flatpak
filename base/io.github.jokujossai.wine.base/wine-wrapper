@@ -1,0 +1,47 @@
+#!/bin/bash
+# Wine wrapper - selects Wine version from extensions
+# Usage: wine <args...>
+
+set -e
+
+BIN_NAME="$(basename "$0")"
+
+# Select Wine version (default: wow64 / wine-10)
+WINEARCH="${WINEARCH:-wow64}"
+WINE_VERSION="${WINE_VERSION:-wine-10}"
+if [ "$WINEARCH" = "win32" ]; then
+    if [ -f "/app/wine/${WINE_VERSION}/bin/wine64" ] || [ ! -f "/app/wine/${WINE_VERSION}/bin32/${BIN_NAME}" ]; then
+        BIN="/app/wine/${WINE_VERSION}/bin/${BIN_NAME}"
+    else
+        BIN="/app/wine/${WINE_VERSION}/bin32/${BIN_NAME}"
+    fi
+    if [ -f "/app/wine/${WINE_VERSION}/bin/wine64" ]; then
+        WINE="/app/wine/${WINE_VERSION}/bin/wine"
+    else
+        WINE="/app/wine/${WINE_VERSION}/bin32/wine"
+    fi
+else
+    if [ -f "/app/wine/${WINE_VERSION}/bin/wine64" ] && [ -f "/app/wine/${WINE_VERSION}/bin/${BIN_NAME}64" ]; then
+        BIN="/app/wine/${WINE_VERSION}/bin/${BIN_NAME}64"
+        WINE="/app/wine/${WINE_VERSION}/bin/wine64"
+    else
+        BIN="/app/wine/${WINE_VERSION}/bin/${BIN_NAME}"
+        WINE="/app/wine/${WINE_VERSION}/bin/wine"
+    fi
+fi
+export WINE
+echo "Using Wine: $WINE"
+
+# Validate Wine installation
+if [ ! -x "$BIN" ]; then
+    echo "Error: Wine version ${WINE_VERSION} not found at ${BIN}" >&2
+    echo "Available versions:" >&2
+    ls -1 /app/wine/ 2>/dev/null || echo "  (none installed)" >&2
+    echo "" >&2
+    echo "Set WINE_VERSION environment variable to select a different version." >&2
+    echo "Example: WINE_VERSION=wine-10 ${BIN} <args>" >&2
+    exit 1
+fi
+
+# Execute wine with all arguments
+exec "$BIN" "$@"

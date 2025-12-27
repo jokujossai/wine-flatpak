@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="runtime">
+  <id>io.github.jokujossai.gamescope</id>
+  <name>Gamescope</name>
+  <summary>SteamOS session compositor</summary>
+  <description>
+    <p>Gamescope is a micro-compositor that provides scaling, frame limiting, and other features for games.</p>
+  </description>
+  <project_license>BSD-2-Clause AND BSD-3-Clause</project_license>
+  <url type="homepage">https://github.com/ValveSoftware/gamescope</url>
+  <metadata_license>CC0-1.0</metadata_license>
+  <releases>
+    <release version="3.16.19" date="2024-12-01"/>
+  </releases>
+</component>

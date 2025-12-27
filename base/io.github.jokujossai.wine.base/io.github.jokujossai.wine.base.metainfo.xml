@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="runtime">
+  <id>io.github.jokujossai.wine.base</id>
+  <name>Wine Base Runtime</name>
+  <summary>Base runtime with Wine dependencies for running Windows applications</summary>
+  <description>
+    <p>
+      This is the base runtime containing all dependencies required by Wine and Wine-based applications.
+      It includes Kerberos, UnixODBC, Samba, and other libraries needed for Windows compatibility.
+    </p>
+  </description>
+  <project_license>LGPL-2.1-or-later</project_license>
+  <url type="homepage">https://github.com/jokujossai/wine-flatpak</url>
+  <metadata_license>CC0-1.0</metadata_license>
+  <releases>
+    <release version="25.08" date="2024-12-26"/>
+  </releases>
+</component>

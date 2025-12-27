@@ -1,0 +1,129 @@
+id: io.github.jokujossai.gamescope
+branch: stable
+runtime: io.github.jokujossai.wine.base
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+build-extension: true
+separate-locales: false
+
+build-options:
+  cflags: -I/app/extensions/gamescope/include
+  cxxflags: -I/app/extensions/gamescope/include
+  ldflags: -L/app/extensions/gamescope/lib
+  prefix: /app/extensions/gamescope
+  libdir: /app/extensions/gamescope/lib
+  prepend-path: /app/extensions/gamescope/bin
+  prepend-ld-library-path: /app/extensions/gamescope/lib
+  prepend-pkg-config-path: /app/extensions/gamescope/lib/pkgconfig
+
+modules:
+  - name: hwdata
+    config-opts:
+      - --datarootdir=${FLATPAK_DEST}/share
+    sources:
+      - type: archive
+        url: https://github.com/vcrhonek/hwdata/archive/v0.402/hwdata-0.402.tar.gz
+        sha256: e390fe2f5f5ef7ed9ccbe62eb7cd40d4ee2b57389e7869c0dc96433c81812e7a
+    post-install:
+      - mkdir -p -m 755 ${FLATPAK_DEST}/lib/pkgconfig
+      - install -m 644 ${FLATPAK_DEST}/share/pkgconfig/hwdata.pc ${FLATPAK_DEST}/lib/pkgconfig/
+    cleanup:
+      - /lib/pkgconfig
+      - /lib/modprobe.d
+      - /share/aclocal
+      - /share/pkgconfig
+
+  - modules/libevdev.yml
+  - modules/libinput.yml
+  - modules/libseat.yml
+  - modules/xwayland.yml
+  - modules/libei.yml
+  - modules/luajit.yml
+
+  - name: gamescope
+    buildsystem: meson
+    config-opts:
+      - -Dpipewire=enabled
+      - -Dforce_fallback_for=stb,wlroots,libliftoff,vkroots
+    sources:
+      - type: git
+        url: https://github.com/ValveSoftware/gamescope.git
+        commit: c3cc9b8414d4afa8c53217112a71f17a95b939f8
+        tag: 3.16.19
+
+      - type: patch
+        path: fix-process-cleanup.patch
+
+      - type: archive
+        url: https://github.com/nothings/stb/archive/5736b15f7ea0ffb08dd38af21067c314d6a3aae9/stb.tar.gz
+        sha256: d00921d49b06af62aa6bfb97c1b136bec661dd11dd4eecbcb0da1f6da7cedb4c
+        dest: subprojects/stb
+
+      - type: archive
+        url: https://github.com/g-truc/glm/archive/0af55ccecd98d4e5a8d1fad7de25ba429d60e863/glm.tar.gz
+        sha256: e7f187d83523f505eb38dd25d297ea6c0d4ed856d733e808f18253f5a8fa88a0
+        dest: subprojects/glm
+
+      - type: shell
+        commands:
+          - echo -n 'Checking stb version ' && grep 5736b15f7ea0ffb08dd38af21067c314d6a3aae9 subprojects/stb.wrap
+          - echo -n 'Checking glm version ' && grep 0af55ccecd98d4e5a8d1fad7de25ba429d60e863 subprojects/glm.wrap
+          - meson subprojects packagefiles --apply
+
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /lib/*.a
+      - /share/pkgconfig
+      - /share/applications
+      - /bin/di-edid-decode
+
+    post-install:
+      - mv ${FLATPAK_DEST}/bin/gamescope ${FLATPAK_DEST}/bin/gamescope-brokey
+
+    modules:
+      - name: xmu
+        sources:
+          - type: archive
+            url: https://www.x.org/archive/individual/lib/libXmu-1.2.1.tar.xz
+            sha256: fcb27793248a39e5fcc5b9c4aec40cc0734b3ca76aac3d7d1c264e7f7e14e8b2
+        cleanup:
+          - /include
+          - /lib/*.la
+          - /lib/*.a
+          - /share
+          - /lib/pkgconfig
+
+      - name: benchmark
+        buildsystem: cmake-ninja
+        config-opts:
+          - -DBENCHMARK_ENABLE_GTEST_TESTS=OFF
+          - -DBENCHMARK_USE_BUNDLED_GTEST=OFF
+          - -DCMAKE_CXX_FLAGS=
+        sources:
+          - type: archive
+            url: https://github.com/google/benchmark/archive/v1.9.4/benchmark-1.9.4.tar.gz
+            sha256: b334658edd35efcf06a99d9be21e4e93e092bd5f95074c1673d5c8705d95c104
+        cleanup:
+          - /include
+          - /lib/*.a
+          - /share
+          - /lib/cmake
+          - /lib/pkgconfig
+
+  - name: metadata
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 gamescope ${FLATPAK_DEST}/bin
+      - install -DCm644 io.github.jokujossai.gamescope.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo
+    sources:
+      - type: file
+        path: io.github.jokujossai.gamescope.metainfo.xml
+      - type: script
+        dest-filename: gamescope
+        commands:
+          - |
+            #!/usr/bin/env bash
+            LD_LIBRARY_PATH=/app/extensions/gamescope/lib:$LD_LIBRARY_PATH
+            PATH=/app/extensions/gamescope/bin:$PATH:/usr/lib/extensions/vulkan/MangoHud/bin
+            exec gamescope-brokey "$@"

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.jokujossai.wine.minesweeper</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>LicenseRef-proprietary</project_license>
+
+  <name>Minesweeper</name>
+  <summary>Classic Windows Minesweeper game</summary>
+
+  <description>
+    <p>
+      The classic Minesweeper game from Windows, running through Wine.
+      Clear the board of mines by flagging them and revealing safe squares.
+    </p>
+    <p>
+      This Flatpak demonstrates how to package old Windows games using the
+      Wine extension system, with optional gamescope integration for HiDPI
+      scaling.
+    </p>
+    <p>
+      Features:
+    </p>
+    <ul>
+      <li>Classic Minesweeper gameplay</li>
+      <li>Runs through Wine 10.x extension</li>
+      <li>Optional gamescope integration for scaling</li>
+      <li>Persistent game settings</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.jokujossai.wine.minesweeper.desktop</launchable>
+
+  <url type="homepage">https://github.com/jokujossai/wine-flatpak</url>
+  <url type="bugtracker">https://github.com/jokujossai/wine-flatpak/issues</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Minesweeper gameplay</caption>
+      <image>https://via.placeholder.com/640x480.png?text=Minesweeper</image>
+    </screenshot>
+  </screenshots>
+
+  <categories>
+    <category>Game</category>
+    <category>LogicGame</category>
+  </categories>
+
+  <keywords>
+    <keyword>minesweeper</keyword>
+    <keyword>puzzle</keyword>
+    <keyword>logic</keyword>
+    <keyword>windows</keyword>
+  </keywords>
+
+  <releases>
+    <release version="1.0.0" date="2025-12-25">
+      <description>
+        <p>Initial release</p>
+        <ul>
+          <li>Classic Windows XP Minesweeper</li>
+          <li>Wine 10.x support</li>
+          <li>Gamescope integration</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+
+  <developer>
+    <name>Daniel Linjama</name>
+  </developer>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="social-chat">none</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="social-contacts">none</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+  </content_rating>
+</component>
