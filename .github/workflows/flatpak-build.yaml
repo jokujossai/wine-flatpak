@@ -1,0 +1,241 @@
+name: Build Flatpak
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  BASE_ID: io.github.jokujossai.wine.base
+  WINE_ID: io.github.jokujossai.wine.Version.wine-10
+  GAMESCOPE_ID: io.github.jokujossai.gamescope
+  GECKO_ID: io.github.jokujossai.wine.gecko
+  MONO_ID: io.github.jokujossai.wine.mono
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+    permissions:
+      contents: read
+      checks: write
+    env:
+      SIGN_KEY: ${{ secrets.ED25519_PRIVATE_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Restore repository
+        if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ED25519_PUBLIC_KEY: ${{ vars.ED25519_PUBLIC_KEY }}
+        run: |
+          set -e
+
+          # Check if repository exists
+          BASE_URL="$(gh api /repos/${GITHUB_REPOSITORY}/pages --jq .html_url)" || true
+          if [ -z "$BASE_URL" ]; then
+            echo "Pages not configured yet"
+            exit 0
+          fi
+
+          curl -o/dev/null -sf "${BASE_URL}summary" || {
+            echo "Repository does not exist yet"
+            exit 0
+          }
+
+          # Mirror repository
+          ostree --repo=repo init --mode=archive
+          ostree --repo=repo remote add wine-flatpak "${BASE_URL%/}" --sign-verify=ed25519=inline:"${ED25519_PUBLIC_KEY}"
+          ostree --repo=repo pull --mirror wine-flatpak --depth=-1 || true
+
+          # Generate summary
+          flatpak build-update-repo \
+            --sign="${SIGN_KEY}" \
+            --generate-static-deltas \
+            --prune \
+            repo || true
+
+      - name: Clean branch name
+        id: clean-branch-name
+        env:
+          BRANCH: ${{ (github.ref_type == 'tag' && 'main') || github.head_ref || github.ref_name }}
+        run: |
+          echo "branch=${BRANCH//\//-}" >> $GITHUB_OUTPUT
+
+      - name: Build Base Runtime
+        id: build-base
+        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: ${{ env.BASE_ID }}.flatpak
+          manifest-path: base/${{ env.BASE_ID }}/${{ env.BASE_ID }}.yml
+          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          build-bundle: ${{ github.ref_type == 'tag' }}
+
+      - name: Build Wine Extension
+        id: build-wine
+        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: ${{ env.WINE_ID }}.flatpak
+          manifest-path: wine/${{ env.WINE_ID }}/${{ env.WINE_ID }}.yml
+          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          build-bundle: ${{ github.ref_type == 'tag' }}
+
+      - name: Build Gamescope Extension
+        id: build-gamescope
+        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: ${{ env.GAMESCOPE_ID }}.flatpak
+          manifest-path: extension/${{ env.GAMESCOPE_ID }}/${{ env.GAMESCOPE_ID }}.yml
+          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          build-bundle: ${{ github.ref_type == 'tag' }}
+
+      - name: Build Gecko Extension
+        id: build-gecko
+        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: ${{ env.GECKO_ID }}.flatpak
+          manifest-path: extension/${{ env.GECKO_ID }}/${{ env.GECKO_ID }}.yml
+          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          build-bundle: ${{ github.ref_type == 'tag' }}
+
+      - name: Build Mono Extension
+        id: build-mono
+        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: ${{ env.MONO_ID }}.flatpak
+          manifest-path: extension/${{ env.MONO_ID }}/${{ env.MONO_ID }}.yml
+          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          build-bundle: ${{ github.ref_type == 'tag' }}
+
+      - name: Update repo
+        id: update-repo
+        run: |
+          flatpak build-update-repo \
+            --sign="${SIGN_KEY}" \
+            --generate-static-deltas \
+            --prune \
+            repo
+
+      - name: Initialize GitHub Pages
+        id: init-github-pages
+        env:
+          ED25519_PUBLIC_KEY: ${{ vars.ED25519_PUBLIC_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -e
+
+          REPO_URL="https://${GITHUB_REPOSITORY%/*}.github.io/${GITHUB_REPOSITORY#*/}"
+
+          cat <<EOF > repo/wine-flatpak.flatpakrepo
+          [Flatpak Repo]
+          Title=Wine Flatpak Games
+          Url=${REPO_URL}
+          Homepage=https://github.com/${GITHUB_REPOSITORY}
+          DeploySideloadCollectionID=io.github.jokujossai.wine
+          SignatureKey=${ED25519_PUBLIC_KEY}
+          EOF
+
+          cat <<EOF > repo/index.html
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Wine Flatpak Games Repository</title>
+              <style>
+                body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+                pre { background: #f5f5f5; padding: 1rem; overflow-x: auto; }
+                code { background: #f5f5f5; padding: 0.2rem 0.4rem; }
+              </style>
+            </head>
+            <body>
+              <h1>Wine Flatpak Games</h1>
+              <p>This is a Flatpak repository for Wine-based Windows games.</p>
+
+              <h2>Installation</h2>
+              <p>Add this repository:</p>
+              <pre>flatpak remote-add --if-not-exists wine-flatpak ${REPO_URL}/wine-flatpak.flatpakrepo</pre>
+
+              <h2>Available Components</h2>
+              <ul>
+                <li><code>${BASE_ID}</code> - Base runtime with Wine dependencies</li>
+                <li><code>${WINE_ID}</code> - Wine 10 extension</li>
+                <li><code>${GAMESCOPE_ID}</code> - Gamescope compositor extension</li>
+                <li><code>${GECKO_ID}</code> - Wine Gecko (IE compatibility)</li>
+                <li><code>${MONO_ID}</code> - Wine Mono (.NET compatibility)</li>
+              </ul>
+
+              <h2>Source Code</h2>
+              <p><a href="https://github.com/${GITHUB_REPOSITORY}">https://github.com/${GITHUB_REPOSITORY}</a></p>
+            </body>
+          </html>
+          EOF
+
+      - name: Upload repository as artifact
+        if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+        uses: actions/upload-artifact@v6
+        with:
+          name: flatpak-repo
+          path: repo/
+          retention-days: 30
+
+      - name: Save pages artifact
+        id: save-repo
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: repo/
+
+      - name: Publish check result
+        uses: LouisBrunner/checks-action@v2.0.0
+        if: always()
+        with:
+          token: ${{ github.token }}
+          name: Build Result
+          conclusion: ${{ steps.build-base.conclusion }}
+          output: |
+            {
+              "summary": "Build completed",
+              "text_description": "Base: ${{ steps.build-base.conclusion }}\nWine: ${{ steps.build-wine.conclusion }}\nGamescope: ${{ steps.build-gamescope.conclusion }}\nGecko: ${{ steps.build-gecko.conclusion }}\nMono: ${{ steps.build-mono.conclusion }}"
+            }
+
+  deploy:
+    if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download flatpak artifacts
+        if: github.ref_type == 'tag'
+        uses: actions/download-artifact@v7
+        with:
+          pattern: "*.flatpak"
+          merge-multiple: true
+
+      - name: Create release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.flatpak"
+          generate_release_notes: true
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

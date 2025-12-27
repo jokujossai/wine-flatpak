@@ -284,10 +284,63 @@ Each game has isolated Wine prefix:
 ~/.var/app/io.github.jokujossai.wine.{gamename}/data/wine (on host)
 ```
 
+## GitHub Actions CI/CD
+
+### Workflow File
+- `.github/workflows/flatpak-build.yaml`
+
+### Triggers
+- Push to `main` branch
+- Pull requests to `main`
+- Tags matching `v*` (triggers deployment)
+- Manual workflow dispatch
+
+### What It Does
+1. Builds all components in order: base → wine → gamescope → gecko → mono
+2. Creates a Flatpak repository
+3. On tags: deploys to GitHub Pages as a Flatpak repo
+
+### GitHub Repository Setup Required
+1. Go to Settings → Pages
+2. Set Source to "GitHub Actions"
+3. Optional: Configure custom domain
+
+### Required Ed25519 Signing Configuration
+
+Generate keys:
+```bash
+# Generate Ed25519 key pair
+openssl genpkey -algorithm ed25519 -out private.pem
+openssl pkey -in private.pem -pubout -out public.pem
+
+# Extract raw 32-byte keys and convert to base64
+openssl pkey -in private.pem -outform DER | tail -c 32 | base64 -w0  # ED25519_PRIVATE_KEY (secret)
+openssl pkey -in public.pem -pubin -outform DER | tail -c 32 | base64 -w0  # ED25519_PUBLIC_KEY (variable)
+
+# Clean up
+rm private.pem public.pem
+```
+
+Variables (Settings → Secrets and variables → Actions → Variables):
+- `ED25519_PUBLIC_KEY` - Base64-encoded 32-byte public key
+
+Secrets (Settings → Secrets and variables → Actions → Secrets):
+- `ED25519_PRIVATE_KEY` - Base64-encoded 32-byte private key
+
+### Using the Published Repository
+```bash
+# Add the repository
+flatpak remote-add --if-not-exists wine-flatpak \
+  https://<user>.github.io/<repo>/wine-flatpak.flatpakrepo
+
+# Install base runtime
+flatpak install wine-flatpak io.github.jokujossai.wine.base
+```
+
 ## License Information
 
 - **Packaging Scripts**: MIT License
-- **Base Manifest Structure**: Derived from org.winehq.Wine (MIT)
+- **Base Manifest Structure**: Inspired by org.winehq.Wine
 - **Wine**: LGPL-2.1-or-later
 - **Gamescope**: BSD-2-Clause
 - **Samba**: GPL-3.0-or-later
