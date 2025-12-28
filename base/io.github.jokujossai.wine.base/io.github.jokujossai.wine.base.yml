@@ -252,6 +252,9 @@ modules:
 
   - name: samba
     build-options:
+      build-args:
+        - --share=network
+        - --allow=devel
       config-opts:
         - --sbindir=/app/bin
         - --libdir=/app/lib
@@ -277,8 +280,6 @@ modules:
       - --without-syslog
       - --without-utmp
       - --without-dmapi
-      - --cross-compile
-      - --cross-answers=samba-cache.txt
     sources: &samba-sources
       - type: archive
         url: https://samba.org/samba/ftp/stable/samba-4.23.4.tar.gz
@@ -288,11 +289,12 @@ modules:
           project-id: 4758
           stable-only: true
           url-template: https://samba.org/samba/ftp/stable/samba-$version.tar.gz
-      - type: file
-        path: samba-cache.txt
 
   - name: samba-32bit
     build-options:
+      build-args:
+        - --share=network
+        - --allow=devel
       arch:
         x86_64: *compat_i386_opts
       config-opts:
