@@ -73,7 +73,7 @@ jobs:
 
       - name: Build Base Runtime
         id: build-base
-        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        uses: flatpak/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: ${{ env.BASE_ID }}.flatpak
           manifest-path: base/${{ env.BASE_ID }}/${{ env.BASE_ID }}.yml
@@ -88,43 +88,47 @@ jobs:
 
       - name: Build Wine Extension
         id: build-wine
-        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        uses: flatpak/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: ${{ env.WINE_ID }}.flatpak
           manifest-path: wine/${{ env.WINE_ID }}/${{ env.WINE_ID }}.yml
           branch: ${{ steps.clean-branch-name.outputs.branch }}
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
+          repository-name: local-repo
 
       - name: Build Gamescope Extension
         id: build-gamescope
-        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        uses: flatpak/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: ${{ env.GAMESCOPE_ID }}.flatpak
           manifest-path: extension/${{ env.GAMESCOPE_ID }}/${{ env.GAMESCOPE_ID }}.yml
           branch: ${{ steps.clean-branch-name.outputs.branch }}
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
+          repository-name: local-repo
 
       - name: Build Gecko Extension
         id: build-gecko
-        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        uses: flatpak/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: ${{ env.GECKO_ID }}.flatpak
           manifest-path: extension/${{ env.GECKO_ID }}/${{ env.GECKO_ID }}.yml
           branch: ${{ steps.clean-branch-name.outputs.branch }}
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
+          repository-name: local-repo
 
       - name: Build Mono Extension
         id: build-mono
-        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        uses: flatpak/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: ${{ env.MONO_ID }}.flatpak
           manifest-path: extension/${{ env.MONO_ID }}/${{ env.MONO_ID }}.yml
           branch: ${{ steps.clean-branch-name.outputs.branch }}
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
+          repository-name: local-repo
 
       - name: Update repo
         id: update-repo
