@@ -81,6 +81,11 @@ jobs:
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
 
+      - name: Install Base Runtime
+        run: |
+          flatpak remote-add --if-not-exists --no-gpg-verify local-repo repo
+          flatpak install -y --noninteractive local-repo ${{ env.BASE_ID }}
+
       - name: Build Wine Extension
         id: build-wine
         uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
