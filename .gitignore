@@ -28,6 +28,3 @@ Thumbs.db
 *.log
 *.tmp
 
-# Keys (except public repo key)
-*.pem
-!/repo.pem

@@ -25,18 +25,33 @@ jobs:
     permissions:
       contents: read
       checks: write
-    env:
-      SIGN_KEY: ${{ secrets.ED25519_PRIVATE_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Setup GPG
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_GREP: ${{ vars.GPG_KEY_GREP }}
+        run: |
+          # Configure gpg-agent for preset passphrase
+          mkdir -p ~/.gnupg
+          echo "allow-preset-passphrase" >> ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye
+
+          # Preset passphrase
+          echo "${GPG_PASSPHRASE}" | /usr/libexec/gpg-preset-passphrase --preset "${GPG_KEY_GREP}"
+
+          # Import private key
+          echo "${GPG_PRIVATE_KEY}" | gpg --import --batch
 
       - name: Restore repository
         if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          ED25519_PUBLIC_KEY: ${{ vars.ED25519_PUBLIC_KEY }}
+          GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
         run: |
           set -e
 
@@ -54,15 +69,19 @@ jobs:
 
           # Mirror repository
           ostree --repo=repo init --mode=archive
-          ostree --repo=repo remote add wine-flatpak "${BASE_URL%/}" --sign-verify=ed25519=inline:"${ED25519_PUBLIC_KEY}"
+          ostree --repo=repo remote add wine-flatpak "${BASE_URL%/}" --gpg-import=repo.gpg
           ostree --repo=repo pull --mirror wine-flatpak --depth=-1 || true
 
           # Generate summary
           flatpak build-update-repo \
-            --sign="${SIGN_KEY}" \
+            --gpg-sign="${GPG_KEY_ID}" \
             --generate-static-deltas \
             --prune \
             repo || true
+
+          # Restore config and cleanup
+          curl -o repo/config -sf "${BASE_URL}config" || true
+          rm -rf repo/*.trustedkeys.gpg repo/extensions repo/state repo/tmp 2>/dev/null || true
 
       - name: Build Base Runtime
         id: build-base
@@ -71,7 +90,7 @@ jobs:
           bundle: ${{ env.BASE_ID }}.flatpak
           manifest-path: base/${{ env.BASE_ID }}/${{ env.BASE_ID }}.yml
           branch: '25.08'
-          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          gpg-sign: ${{ vars.GPG_KEY_ID }}
           build-bundle: ${{ github.ref_type == 'tag' }}
 
       - name: Install Base Runtime
@@ -86,7 +105,7 @@ jobs:
           bundle: ${{ env.WINE_ID }}.flatpak
           manifest-path: wine/${{ env.WINE_ID }}/${{ env.WINE_ID }}.yml
           branch: '25.08'
-          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          gpg-sign: ${{ vars.GPG_KEY_ID }}
           build-bundle: ${{ github.ref_type == 'tag' }}
           repository-name: local-repo
 
@@ -97,7 +116,7 @@ jobs:
           bundle: ${{ env.GAMESCOPE_ID }}.flatpak
           manifest-path: extension/${{ env.GAMESCOPE_ID }}/${{ env.GAMESCOPE_ID }}.yml
           branch: '25.08'
-          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          gpg-sign: ${{ vars.GPG_KEY_ID }}
           build-bundle: ${{ github.ref_type == 'tag' }}
           repository-name: local-repo
 
@@ -108,7 +127,7 @@ jobs:
           bundle: ${{ env.GECKO_ID }}.flatpak
           manifest-path: extension/${{ env.GECKO_ID }}/${{ env.GECKO_ID }}.yml
           branch: '25.08'
-          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          gpg-sign: ${{ vars.GPG_KEY_ID }}
           build-bundle: ${{ github.ref_type == 'tag' }}
           repository-name: local-repo
 
@@ -119,15 +138,17 @@ jobs:
           bundle: ${{ env.MONO_ID }}.flatpak
           manifest-path: extension/${{ env.MONO_ID }}/${{ env.MONO_ID }}.yml
           branch: '25.08'
-          sign: ${{ secrets.ED25519_PRIVATE_KEY }}
+          gpg-sign: ${{ vars.GPG_KEY_ID }}
           build-bundle: ${{ github.ref_type == 'tag' }}
           repository-name: local-repo
 
       - name: Update repo
         id: update-repo
+        env:
+          GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
         run: |
           flatpak build-update-repo \
-            --sign="${SIGN_KEY}" \
+            --gpg-sign="${GPG_KEY_ID}" \
             --generate-static-deltas \
             --prune \
             repo
@@ -135,20 +156,21 @@ jobs:
       - name: Initialize GitHub Pages
         id: init-github-pages
         env:
-          ED25519_PUBLIC_KEY: ${{ vars.ED25519_PUBLIC_KEY }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           set -e
 
           REPO_URL="https://${GITHUB_REPOSITORY%/*}.github.io/${GITHUB_REPOSITORY#*/}"
 
+          # Copy public key to repo
+          cp repo.gpg repo/
+
           cat <<EOF > repo/wine-flatpak.flatpakrepo
           [Flatpak Repo]
           Title=Wine Flatpak Games
           Url=${REPO_URL}
           Homepage=https://github.com/${GITHUB_REPOSITORY}
-          DeploySideloadCollectionID=io.github.jokujossai.wine
-          SignatureKey=${ED25519_PUBLIC_KEY}
+          GPGKey=$(base64 -w0 repo.gpg)
           EOF
 
           cat <<EOF > repo/index.html
