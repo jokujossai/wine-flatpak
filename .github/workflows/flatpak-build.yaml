@@ -64,20 +64,13 @@ jobs:
             --prune \
             repo || true
 
-      - name: Clean branch name
-        id: clean-branch-name
-        env:
-          BRANCH: ${{ (github.ref_type == 'tag' && 'main') || github.head_ref || github.ref_name }}
-        run: |
-          echo "branch=${BRANCH//\//-}" >> $GITHUB_OUTPUT
-
       - name: Build Base Runtime
         id: build-base
         uses: flatpak/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: ${{ env.BASE_ID }}.flatpak
           manifest-path: base/${{ env.BASE_ID }}/${{ env.BASE_ID }}.yml
-          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          branch: '25.08'
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
 
@@ -92,7 +85,7 @@ jobs:
         with:
           bundle: ${{ env.WINE_ID }}.flatpak
           manifest-path: wine/${{ env.WINE_ID }}/${{ env.WINE_ID }}.yml
-          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          branch: '25.08'
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
           repository-name: local-repo
@@ -103,7 +96,7 @@ jobs:
         with:
           bundle: ${{ env.GAMESCOPE_ID }}.flatpak
           manifest-path: extension/${{ env.GAMESCOPE_ID }}/${{ env.GAMESCOPE_ID }}.yml
-          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          branch: '25.08'
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
           repository-name: local-repo
@@ -114,7 +107,7 @@ jobs:
         with:
           bundle: ${{ env.GECKO_ID }}.flatpak
           manifest-path: extension/${{ env.GECKO_ID }}/${{ env.GECKO_ID }}.yml
-          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          branch: '25.08'
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
           repository-name: local-repo
@@ -125,7 +118,7 @@ jobs:
         with:
           bundle: ${{ env.MONO_ID }}.flatpak
           manifest-path: extension/${{ env.MONO_ID }}/${{ env.MONO_ID }}.yml
-          branch: ${{ steps.clean-branch-name.outputs.branch }}
+          branch: '25.08'
           sign: ${{ secrets.ED25519_PRIVATE_KEY }}
           build-bundle: ${{ github.ref_type == 'tag' }}
           repository-name: local-repo
