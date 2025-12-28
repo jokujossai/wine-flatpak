@@ -252,9 +252,6 @@ modules:
 
   - name: samba
     build-options:
-      build-args:
-        - --share=network
-        - --allow=devel
       config-opts:
         - --sbindir=/app/bin
         - --libdir=/app/lib
@@ -289,12 +286,11 @@ modules:
           project-id: 4758
           stable-only: true
           url-template: https://samba.org/samba/ftp/stable/samba-$version.tar.gz
+      - type: patch
+        path: samba-skip-setuid-check.patch
 
   - name: samba-32bit
     build-options:
-      build-args:
-        - --share=network
-        - --allow=devel
       arch:
         x86_64: *compat_i386_opts
       config-opts:
