@@ -1,0 +1,54 @@
+From: Wine Flatpak <wine-flatpak@users.noreply.github.com>
+Subject: Skip runtime setuid checks in configure
+
+In sandboxed build environments (like GitHub Actions), the setresuid/seteuid
+syscalls may be blocked even though they exist and work at runtime.
+Change the configure checks to only verify compilation, not execution.
+
+diff --git a/source3/wscript b/source3/wscript
+--- a/source3/wscript
++++ b/source3/wscript
+@@ -978,7 +978,7 @@ main() {
+                                 ''',
+                                 'USE_LINUX_THREAD_CREDENTIALS',
+                                 addmain=False,
+-                                execute=True,
++                                execute=False,
+                                 msg="Checking whether we can use Linux thread-specific credentials")
+
+     # Check for various setuid options.
+@@ -990,7 +990,7 @@ main() {
+                                 ''',
+                                 'USE_SETREUID',
+                                 addmain=False,
+-                                execute=True,
++                                execute=False,
+                                 msg="Checking whether setreuid is available")
+     if not seteuid:
+         seteuid = conf.CHECK_CODE('''
+@@ -1001,7 +1001,7 @@ main() {
+                                 ''',
+                                 'USE_SETRESUID',
+                                 addmain=False,
+-                                execute=True,
++                                execute=False,
+                                 msg="Checking whether setresuid is available")
+     if not seteuid:
+         seteuid = conf.CHECK_CODE('''
+@@ -1012,7 +1012,7 @@ main() {
+                                 ''',
+                                 'USE_SETEUID',
+                                 addmain=False,
+-                                execute=True,
++                                execute=False,
+                                 msg="Checking whether seteuid is available")
+     if not seteuid:
+         seteuid = conf.CHECK_CODE('''
+@@ -1023,7 +1023,7 @@ main() {
+                                 ''',
+                                 'USE_SETUIDX',
+                                 addmain=False,
+-                                execute=True,
++                                execute=False,
+                                 mandatory=True,
+                                 msg="Checking whether setuidx is available")
