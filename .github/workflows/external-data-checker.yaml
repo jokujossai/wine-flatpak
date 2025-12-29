@@ -1,0 +1,46 @@
+name: Check for updates
+
+on:
+  # schedule:
+  #   - cron: '0 0 * * *'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        manifest:
+          - wine/io.github.jokujossai.wine.Version.wine-10/io.github.jokujossai.wine.Version.wine-10.yml
+          - extension/io.github.jokujossai.gamescope/io.github.jokujossai.gamescope.yml
+          - extension/io.github.jokujossai.wine.gecko/io.github.jokujossai.wine.gecko.yml
+          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.yml
+    steps:
+      - name: Generate app token
+        uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Get GitHub App User ID
+        id: get-user-id
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check for updates
+        uses: docker://ghcr.io/flathub-infra/flatpak-external-data-checker:latest
+        env:
+          GIT_AUTHOR_NAME: ${{ steps.app-token.outputs.app-slug }}[bot]
+          GIT_COMMITTER_NAME: ${{ steps.app-token.outputs.app-slug }}[bot]
+          GIT_AUTHOR_EMAIL: ${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com
+          GIT_COMMITTER_EMAIL: ${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        with:
+          args: --update --never-fork ${{ matrix.manifest }}

@@ -19,5 +19,10 @@ modules:
         url: https://dl.winehq.org/wine/wine-mono/10.3.0/wine-mono-10.3.0-x86.tar.xz
         strip-components: 0
         sha256: 009651c4baa2c5010c70aa28728a85e24a04485ff0e22b8cd5eea4eb8959e72e
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/wine-mono/wine-mono/releases/latest
+          version-query: .tag_name | sub("^wine-mono-"; "")
+          url-query: '"https://dl.winehq.org/wine/wine-mono/" + (.tag_name | sub("^wine-mono-"; "")) + "/wine-mono-" + (.tag_name | sub("^wine-mono-"; "")) + "-x86.tar.xz"'
       - type: file
         path: io.github.jokujossai.wine.mono.metainfo.xml
