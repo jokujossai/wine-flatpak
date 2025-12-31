@@ -323,7 +323,7 @@ modules:
   - name: 7zip
     buildsystem: simple
     build-commands:
-      - tar -xf 7z2501-linux-x64.tar.xz 7zz
+      - tar -xf 7z*-linux-x64.tar.xz 7zz
       - install -Dm755 7zz ${FLATPAK_DEST}/bin/7zz
       - ln -s 7zz ${FLATPAK_DEST}/bin/7z
       - ln -s 7zz ${FLATPAK_DEST}/bin/7za
@@ -331,6 +331,11 @@ modules:
       - type: file
         url: https://7-zip.org/a/7z2501-linux-x64.tar.xz
         sha256: 4ca3b7c6f2f67866b92622818b58233dc70367be2f36b498eb0bdeaaa44b53f4
+        x-checker-data:
+          type: html
+          url: https://7-zip.org/download.html
+          version-pattern: 7z(\d+)-linux-x64\.tar\.xz
+          url-template: https://7-zip.org/a/7z$version-linux-x64.tar.xz
 
   # Flatpak bundle
 
