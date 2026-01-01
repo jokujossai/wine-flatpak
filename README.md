@@ -9,7 +9,37 @@ Custom Flatpak packaging for Windows games using Wine, with gamescope integratio
 - **Simple Configuration**: Games configured via `config.ini`
 - **32-bit Support**: Full multiarch support for old Windows games
 
-## Quick Start
+## Installation
+
+### Add Repository
+
+```bash
+flatpak remote-add --if-not-exists wine-flatpak https://jokujossai.github.io/wine-flatpak/wine-flatpak.flatpakrepo
+```
+
+### Install a Game
+
+```bash
+# Install minesweeper (includes required runtime and extensions)
+flatpak install wine-flatpak io.github.jokujossai.wine.minesweeper
+
+# Run
+flatpak run io.github.jokujossai.wine.minesweeper
+```
+
+### Available Components
+
+| Component | ID | Description |
+|-----------|-----|-------------|
+| Base Runtime | `io.github.jokujossai.wine.base` | Wine dependencies and utilities |
+| Wine 10 | `io.github.jokujossai.wine.Version.wine-10` | Wine 10.x |
+| Wine 9 | `io.github.jokujossai.wine.Version.wine-9` | Wine 9.x (for compatibility) |
+| Gamescope | `io.github.jokujossai.gamescope` | Upscaling compositor |
+| Gecko | `io.github.jokujossai.wine.gecko` | IE compatibility |
+| Mono | `io.github.jokujossai.wine.mono` | .NET compatibility |
+| Minesweeper | `io.github.jokujossai.wine.minesweeper` | Example game |
+
+## Building from Source
 
 ### Build Components (in order)
 
