@@ -9,6 +9,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   BASE_ID: io.github.jokujossai.wine.base
   WINE_ID: io.github.jokujossai.wine.Version.wine-10
