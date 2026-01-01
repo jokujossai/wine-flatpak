@@ -214,6 +214,8 @@ jobs:
           # Pull from each component repo
           for component_dir in components/*-repo; do
             if [ -d "$component_dir/objects" ]; then
+              # Create refs/remotes if missing (flatpak-builder repos may not have it)
+              mkdir -p "$component_dir/refs/remotes"
               echo "Pulling from $component_dir"
               ostree --repo=repo pull-local "$component_dir"
             fi
