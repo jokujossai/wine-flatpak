@@ -16,13 +16,14 @@ modules:
       - install -Dm644 io.github.jokujossai.wine.mono.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/
     sources:
       - type: archive
-        url: https://dl.winehq.org/wine/wine-mono/10.3.0/wine-mono-10.3.0-x86.tar.xz
+        url: https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.tar.xz
         strip-components: 0
-        sha256: 009651c4baa2c5010c70aa28728a85e24a04485ff0e22b8cd5eea4eb8959e72e
+        sha256: a16606ef0724202e6a6848ece6e0cbba64d11e2f11aefe744af1d93c6d9f99bb
         x-checker-data:
           type: json
           url: https://api.github.com/repos/wine-mono/wine-mono/releases/latest
           version-query: .tag_name | sub("^wine-mono-"; "")
-          url-query: '"https://dl.winehq.org/wine/wine-mono/" + (.tag_name | sub("^wine-mono-"; "")) + "/wine-mono-" + (.tag_name | sub("^wine-mono-"; "")) + "-x86.tar.xz"'
+          url-query: '"https://dl.winehq.org/wine/wine-mono/" + (.tag_name | sub("^wine-mono-";
+            "")) + "/wine-mono-" + (.tag_name | sub("^wine-mono-"; "")) + "-x86.tar.xz"'
       - type: file
         path: io.github.jokujossai.wine.mono.metainfo.xml
