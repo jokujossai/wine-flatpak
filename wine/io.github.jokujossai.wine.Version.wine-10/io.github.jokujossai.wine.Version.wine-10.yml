@@ -57,9 +57,11 @@ modules:
           https://gitlab.winehq.org/wine/wine/-/raw/master/dlls/appwiz.cpl/addons.c
         x-checker-data:
           type: html
-          url: https://gitlab.winehq.org/wine/wine/-/raw/master/VERSION
-          version-pattern: Wine version (\d[\d\w\.-]+\d)
-          url-template: https://dl.winehq.org/wine/source/$major.$minor/wine-$version.tar.xz
+          url: https://dl.winehq.org/wine/source/10.x/
+          version-pattern: wine-(\d+\.[\d.]+)\.tar\.xz
+          url-template: https://dl.winehq.org/wine/source/10.x/wine-$version.tar.xz
+          versions:
+            <: '11.0'
           is-main-source: true
 
   # 32-bit compatibility build
