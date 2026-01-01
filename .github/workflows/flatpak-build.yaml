@@ -113,6 +113,13 @@ jobs:
           flatpak remote-add --if-not-exists --no-gpg-verify base-repo base-repo
           flatpak install -y --noninteractive base-repo io.github.jokujossai.wine.base
 
+      - name: Install SDK extensions for Wine
+        if: startsWith(matrix.name, 'wine-')
+        run: |
+          flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Compat.i386//25.08
+          flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Extension.toolchain-i386//25.08
+          flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Extension.mingw-w64//25.08
+
       - name: Build ${{ matrix.name }}
         id: build
         uses: flatpak/flatpak-github-actions/flatpak-builder@master
