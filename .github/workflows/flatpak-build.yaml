@@ -13,15 +13,133 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  BASE_ID: io.github.jokujossai.wine.base
-  WINE_ID: io.github.jokujossai.wine.Version.wine-10
-  GAMESCOPE_ID: io.github.jokujossai.gamescope
-  GECKO_ID: io.github.jokujossai.wine.gecko
-  MONO_ID: io.github.jokujossai.wine.mono
-
 jobs:
-  build:
+  build-base:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup GPG
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_GREP: ${{ vars.GPG_KEY_GREP }}
+        run: |
+          mkdir -p ~/.gnupg
+          echo "allow-preset-passphrase" >> ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye
+          echo "${GPG_PASSPHRASE}" | /usr/libexec/gpg-preset-passphrase --preset "${GPG_KEY_GREP}"
+          echo "${GPG_PRIVATE_KEY}" | gpg --import --batch
+
+      - name: Build Base Runtime
+        id: build-base
+        uses: flatpak/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: io.github.jokujossai.wine.base.flatpak
+          manifest-path: base/io.github.jokujossai.wine.base/io.github.jokujossai.wine.base.yml
+          branch: '25.08'
+          gpg-sign: ${{ vars.GPG_KEY_ID }}
+          build-bundle: ${{ github.ref_type == 'tag' }}
+
+      - name: Upload base repo
+        uses: actions/upload-artifact@v6
+        with:
+          name: base-repo
+          path: repo/
+          retention-days: 1
+
+  build-components:
+    needs: build-base
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: wine-9
+            id: io.github.jokujossai.wine.Version.wine-9
+            manifest: wine/io.github.jokujossai.wine.Version.wine-9/io.github.jokujossai.wine.Version.wine-9.yml
+            branch: '25.08'
+          - name: wine-10
+            id: io.github.jokujossai.wine.Version.wine-10
+            manifest: wine/io.github.jokujossai.wine.Version.wine-10/io.github.jokujossai.wine.Version.wine-10.yml
+            branch: '25.08'
+          - name: gamescope
+            id: io.github.jokujossai.gamescope
+            manifest: extension/io.github.jokujossai.gamescope/io.github.jokujossai.gamescope.yml
+            branch: stable
+          - name: gecko
+            id: io.github.jokujossai.wine.gecko
+            manifest: extension/io.github.jokujossai.wine.gecko/io.github.jokujossai.wine.gecko.yml
+            branch: stable
+          - name: mono
+            id: io.github.jokujossai.wine.mono
+            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.yml
+            branch: stable
+          - name: minesweeper
+            id: io.github.jokujossai.wine.minesweeper
+            manifest: game/io.github.jokujossai.wine.minesweeper/io.github.jokujossai.wine.minesweeper.yml
+            branch: stable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup GPG
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_GREP: ${{ vars.GPG_KEY_GREP }}
+        run: |
+          mkdir -p ~/.gnupg
+          echo "allow-preset-passphrase" >> ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye
+          echo "${GPG_PASSPHRASE}" | /usr/libexec/gpg-preset-passphrase --preset "${GPG_KEY_GREP}"
+          echo "${GPG_PRIVATE_KEY}" | gpg --import --batch
+
+      - name: Download base repo
+        uses: actions/download-artifact@v7
+        with:
+          name: base-repo
+          path: base-repo/
+
+      - name: Install base runtime
+        run: |
+          flatpak remote-add --if-not-exists --no-gpg-verify base-repo base-repo
+          flatpak install -y --noninteractive base-repo io.github.jokujossai.wine.base
+
+      - name: Install SDK extensions for Wine
+        if: startsWith(matrix.name, 'wine-')
+        run: |
+          flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Compat.i386//25.08
+          flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Extension.toolchain-i386//25.08
+          flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Extension.mingw-w64//25.08
+
+      - name: Build ${{ matrix.name }}
+        id: build
+        uses: flatpak/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: ${{ matrix.id }}.flatpak
+          manifest-path: ${{ matrix.manifest }}
+          branch: ${{ matrix.branch }}
+          gpg-sign: ${{ vars.GPG_KEY_ID }}
+          build-bundle: ${{ github.ref_type == 'tag' }}
+          repository-name: base-repo
+
+      - name: Upload component repo
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.name }}-repo
+          path: repo/
+          retention-days: 1
+
+  assemble-repo:
+    needs: build-components
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
@@ -39,15 +157,10 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           GPG_KEY_GREP: ${{ vars.GPG_KEY_GREP }}
         run: |
-          # Configure gpg-agent for preset passphrase
           mkdir -p ~/.gnupg
           echo "allow-preset-passphrase" >> ~/.gnupg/gpg-agent.conf
           gpg-connect-agent reloadagent /bye
-
-          # Preset passphrase
           echo "${GPG_PASSPHRASE}" | /usr/libexec/gpg-preset-passphrase --preset "${GPG_KEY_GREP}"
-
-          # Import private key
           echo "${GPG_PRIVATE_KEY}" | gpg --import --batch
 
       - name: Restore repository
@@ -59,7 +172,6 @@ jobs:
         run: |
           set -e
 
-          # Check if repository exists
           BASE_URL="$(gh api /repos/${GITHUB_REPOSITORY}/pages --jq .html_url)" || true
           if [ -z "$BASE_URL" ]; then
             echo "Pages not configured yet"
@@ -71,83 +183,45 @@ jobs:
             exit 0
           }
 
-          # Mirror repository
           ostree --repo=repo init --mode=archive
           ostree --repo=repo remote add wine-flatpak "${BASE_URL%/}" --gpg-import=repo.gpg
           ostree --repo=repo pull --mirror wine-flatpak --depth=-1 || true
 
-          # Generate summary
           flatpak build-update-repo \
             --gpg-sign="${GPG_KEY_ID}" \
             --generate-static-deltas \
             --prune \
             repo || true
 
-          # Restore config and cleanup
           curl -o repo/config -sf "${BASE_URL}config" || true
           rm -rf repo/*.trustedkeys.gpg repo/extensions repo/state repo/tmp 2>/dev/null || true
 
-      - name: Build Base Runtime
-        id: build-base
-        uses: flatpak/flatpak-github-actions/flatpak-builder@master
+      - name: Download all component repos
+        uses: actions/download-artifact@v7
         with:
-          bundle: ${{ env.BASE_ID }}.flatpak
-          manifest-path: base/${{ env.BASE_ID }}/${{ env.BASE_ID }}.yml
-          branch: '25.08'
-          gpg-sign: ${{ vars.GPG_KEY_ID }}
-          build-bundle: ${{ github.ref_type == 'tag' }}
+          pattern: '*-repo'
+          path: components/
 
-      - name: Install Base Runtime
+      - name: Merge component repos
         run: |
-          flatpak remote-add --if-not-exists --no-gpg-verify local-repo repo
-          flatpak install -y --noninteractive local-repo ${{ env.BASE_ID }}
+          set -e
 
-      - name: Build Wine Extension
-        id: build-wine
-        uses: flatpak/flatpak-github-actions/flatpak-builder@master
-        with:
-          bundle: ${{ env.WINE_ID }}.flatpak
-          manifest-path: wine/${{ env.WINE_ID }}/${{ env.WINE_ID }}.yml
-          branch: '25.08'
-          gpg-sign: ${{ vars.GPG_KEY_ID }}
-          build-bundle: ${{ github.ref_type == 'tag' }}
-          repository-name: local-repo
+          # Initialize repo if not restored
+          if [ ! -d repo/objects ]; then
+            ostree --repo=repo init --mode=archive
+          fi
 
-      - name: Build Gamescope Extension
-        id: build-gamescope
-        uses: flatpak/flatpak-github-actions/flatpak-builder@master
-        with:
-          bundle: ${{ env.GAMESCOPE_ID }}.flatpak
-          manifest-path: extension/${{ env.GAMESCOPE_ID }}/${{ env.GAMESCOPE_ID }}.yml
-          branch: '25.08'
-          gpg-sign: ${{ vars.GPG_KEY_ID }}
-          build-bundle: ${{ github.ref_type == 'tag' }}
-          repository-name: local-repo
-
-      - name: Build Gecko Extension
-        id: build-gecko
-        uses: flatpak/flatpak-github-actions/flatpak-builder@master
-        with:
-          bundle: ${{ env.GECKO_ID }}.flatpak
-          manifest-path: extension/${{ env.GECKO_ID }}/${{ env.GECKO_ID }}.yml
-          branch: '25.08'
-          gpg-sign: ${{ vars.GPG_KEY_ID }}
-          build-bundle: ${{ github.ref_type == 'tag' }}
-          repository-name: local-repo
-
-      - name: Build Mono Extension
-        id: build-mono
-        uses: flatpak/flatpak-github-actions/flatpak-builder@master
-        with:
-          bundle: ${{ env.MONO_ID }}.flatpak
-          manifest-path: extension/${{ env.MONO_ID }}/${{ env.MONO_ID }}.yml
-          branch: '25.08'
-          gpg-sign: ${{ vars.GPG_KEY_ID }}
-          build-bundle: ${{ github.ref_type == 'tag' }}
-          repository-name: local-repo
+          # Pull from each component repo
+          for component_dir in components/*-repo; do
+            if [ -d "$component_dir/objects" ]; then
+              # Create refs/remotes if missing (flatpak-builder repos may not have it)
+              mkdir -p "$component_dir/refs/remotes"
+              echo "Pulling from $component_dir"
+              ostree --repo=repo pull-local "$component_dir"
+            fi
+          done
 
       - name: Update repo
-        id: update-repo
         env:
           GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
         run: |
@@ -158,7 +232,6 @@ jobs:
             repo
 
       - name: Initialize GitHub Pages
-        id: init-github-pages
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
@@ -166,7 +239,6 @@ jobs:
 
           REPO_URL="https://${GITHUB_REPOSITORY%/*}.github.io/${GITHUB_REPOSITORY#*/}"
 
-          # Copy public key to repo
           cp repo.gpg repo/
 
           cat <<EOF > repo/wine-flatpak.flatpakrepo
@@ -198,11 +270,12 @@ jobs:
 
               <h2>Available Components</h2>
               <ul>
-                <li><code>${BASE_ID}</code> - Base runtime with Wine dependencies</li>
-                <li><code>${WINE_ID}</code> - Wine 10 extension</li>
-                <li><code>${GAMESCOPE_ID}</code> - Gamescope compositor extension</li>
-                <li><code>${GECKO_ID}</code> - Wine Gecko (IE compatibility)</li>
-                <li><code>${MONO_ID}</code> - Wine Mono (.NET compatibility)</li>
+                <li><code>io.github.jokujossai.wine.base</code> - Base runtime with Wine dependencies</li>
+                <li><code>io.github.jokujossai.wine.Version.wine-9</code> - Wine 9 extension</li>
+                <li><code>io.github.jokujossai.wine.Version.wine-10</code> - Wine 10 extension</li>
+                <li><code>io.github.jokujossai.gamescope</code> - Gamescope compositor extension</li>
+                <li><code>io.github.jokujossai.wine.gecko</code> - Wine Gecko (IE compatibility)</li>
+                <li><code>io.github.jokujossai.wine.mono</code> - Wine Mono (.NET compatibility)</li>
               </ul>
 
               <h2>Source Code</h2>
@@ -211,7 +284,7 @@ jobs:
           </html>
           EOF
 
-      - name: Upload repository as artifact
+      - name: Upload repository artifact
         if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
         uses: actions/upload-artifact@v6
         with:
@@ -220,7 +293,6 @@ jobs:
           retention-days: 30
 
       - name: Save pages artifact
-        id: save-repo
         uses: actions/upload-pages-artifact@v4
         with:
           path: repo/
@@ -231,17 +303,16 @@ jobs:
         with:
           token: ${{ github.token }}
           name: Build Result
-          conclusion: ${{ steps.build-base.conclusion }}
+          conclusion: ${{ job.status }}
           output: |
             {
-              "summary": "Build completed",
-              "text_description": "Base: ${{ steps.build-base.conclusion }}\nWine: ${{ steps.build-wine.conclusion }}\nGamescope: ${{ steps.build-gamescope.conclusion }}\nGecko: ${{ steps.build-gecko.conclusion }}\nMono: ${{ steps.build-mono.conclusion }}"
+              "summary": "Build completed"
             }
 
   deploy:
     if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
     runs-on: ubuntu-latest
-    needs: build
+    needs: assemble-repo
     permissions:
       contents: write
       pages: write
