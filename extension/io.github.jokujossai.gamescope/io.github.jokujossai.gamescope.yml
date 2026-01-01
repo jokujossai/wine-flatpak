@@ -118,10 +118,9 @@ modules:
             url: https://github.com/google/benchmark/archive/v1.9.4/benchmark-1.9.4.tar.gz
             sha256: b334658edd35efcf06a99d9be21e4e93e092bd5f95074c1673d5c8705d95c104
             x-checker-data:
-              type: anitya
-              project-id: 15503
-              stable-only: true
-              url-template: https://github.com/google/benchmark/archive/v$version/benchmark-$version.tar.gz
+              type: git
+              tag-pattern: ^v([\d.]+)$
+              url: https://github.com/google/benchmark.git
         cleanup:
           - /include
           - /lib/*.a
