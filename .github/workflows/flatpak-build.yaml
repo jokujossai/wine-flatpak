@@ -70,6 +70,14 @@ jobs:
             id: io.github.jokujossai.wine.Version.wine-10
             manifest: wine/io.github.jokujossai.wine.Version.wine-10/io.github.jokujossai.wine.Version.wine-10.yml
             branch: '25.08'
+          - name: wine-9-wow64
+            id: io.github.jokujossai.wine.Version.wine-9-wow64
+            manifest: wine/io.github.jokujossai.wine.Version.wine-9-wow64/io.github.jokujossai.wine.Version.wine-9-wow64.yml
+            branch: '25.08'
+          - name: wine-10-wow64
+            id: io.github.jokujossai.wine.Version.wine-10-wow64
+            manifest: wine/io.github.jokujossai.wine.Version.wine-10-wow64/io.github.jokujossai.wine.Version.wine-10-wow64.yml
+            branch: '25.08'
           - name: gamescope
             id: io.github.jokujossai.gamescope
             manifest: extension/io.github.jokujossai.gamescope/io.github.jokujossai.gamescope.yml
@@ -114,10 +122,15 @@ jobs:
           flatpak install -y --noninteractive base-repo io.github.jokujossai.wine.base
 
       - name: Install SDK extensions for Wine
-        if: startsWith(matrix.name, 'wine-')
+        if: matrix.name == 'wine-9' || matrix.name == 'wine-10'
         run: |
           flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Compat.i386//25.08
           flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Extension.toolchain-i386//25.08
+          flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Extension.mingw-w64//25.08
+
+      - name: Install SDK extensions for Wine WoW64
+        if: matrix.name == 'wine-9-wow64' || matrix.name == 'wine-10-wow64'
+        run: |
           flatpak install -y --noninteractive flathub org.freedesktop.Sdk.Extension.mingw-w64//25.08
 
       - name: Build ${{ matrix.name }}
@@ -272,7 +285,9 @@ jobs:
               <ul>
                 <li><code>io.github.jokujossai.wine.base</code> - Base runtime with Wine dependencies</li>
                 <li><code>io.github.jokujossai.wine.Version.wine-9</code> - Wine 9 extension</li>
+                <li><code>io.github.jokujossai.wine.Version.wine-9-wow64</code> - Wine 9 WoW64 extension</li>
                 <li><code>io.github.jokujossai.wine.Version.wine-10</code> - Wine 10 extension</li>
+                <li><code>io.github.jokujossai.wine.Version.wine-10-wow64</code> - Wine 10 WoW64 extension</li>
                 <li><code>io.github.jokujossai.gamescope</code> - Gamescope compositor extension</li>
                 <li><code>io.github.jokujossai.wine.gecko</code> - Wine Gecko (IE compatibility)</li>
                 <li><code>io.github.jokujossai.wine.mono</code> - Wine Mono (.NET compatibility)</li>

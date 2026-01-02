@@ -33,7 +33,9 @@ flatpak run io.github.jokujossai.wine.minesweeper
 |-----------|-----|-------------|
 | Base Runtime | `io.github.jokujossai.wine.base` | Wine dependencies and utilities |
 | Wine 10 | `io.github.jokujossai.wine.Version.wine-10` | Wine 10.x |
+| Wine 10 WoW64 | `io.github.jokujossai.wine.Version.wine-10-wow64` | Wine 10.x (unified WoW64 build) |
 | Wine 9 | `io.github.jokujossai.wine.Version.wine-9` | Wine 9.x (for compatibility) |
+| Wine 9 WoW64 | `io.github.jokujossai.wine.Version.wine-9-wow64` | Wine 9.x (unified WoW64 build) |
 | Gamescope | `io.github.jokujossai.gamescope` | Upscaling compositor |
 | Gecko | `io.github.jokujossai.wine.gecko` | IE compatibility |
 | Mono | `io.github.jokujossai.wine.mono` | .NET compatibility |

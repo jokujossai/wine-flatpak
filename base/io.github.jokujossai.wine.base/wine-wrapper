@@ -1,47 +1,101 @@
 #!/bin/bash
-# Wine wrapper - selects Wine version from extensions
-# Usage: wine <args...>
+# Wine wrapper - selects Wine version and handles architecture
 
 set -e
 
 BIN_NAME="$(basename "$0")"
-
-# Select Wine version (default: wow64 / wine-10)
-WINEARCH="${WINEARCH:-wow64}"
 WINE_VERSION="${WINE_VERSION:-wine-10}"
-if [ "$WINEARCH" = "win32" ]; then
-    if [ -f "/app/wine/${WINE_VERSION}/bin/wine64" ] || [ ! -f "/app/wine/${WINE_VERSION}/bin32/${BIN_NAME}" ]; then
-        BIN="/app/wine/${WINE_VERSION}/bin/${BIN_NAME}"
+WINE_BIN="/app/wine/${WINE_VERSION}/bin"
+
+# Detect Wine build type
+detect_wine_type() {
+    if [ -f "/app/wine/${WINE_VERSION}/bin32/wine" ] || [ -f "${WINE_BIN}/wine64" ]; then
+        # Traditional build: Wine 9 has bin32/wine, Wine 10 has bin/wine64
+        echo "traditional"
+    elif [ -f "${WINE_BIN}/wine" ]; then
+        # WoW64 unified build (no bin32, no wine64)
+        echo "wow64"
     else
-        BIN="/app/wine/${WINE_VERSION}/bin32/${BIN_NAME}"
+        echo "unknown"
     fi
-    if [ -f "/app/wine/${WINE_VERSION}/bin/wine64" ]; then
-        WINE="/app/wine/${WINE_VERSION}/bin/wine"
+}
+
+# Get prefix architecture from system.reg
+get_prefix_arch() {
+    if [ -f "$WINEPREFIX/system.reg" ]; then
+        grep -oP '#arch=\K\w+' "$WINEPREFIX/system.reg" 2>/dev/null || echo "unknown"
     else
-        WINE="/app/wine/${WINE_VERSION}/bin32/wine"
+        echo "none"
+    fi
+}
+
+WINE_TYPE=$(detect_wine_type)
+
+# Handle WoW64: unset WINEARCH
+if [ "$WINE_TYPE" = "wow64" ]; then
+    unset WINEARCH
+    BIN="${WINE_BIN}/${BIN_NAME}"
+    WINE="${WINE_BIN}/wine"
+elif [ "$WINE_TYPE" = "traditional" ]; then
+    # Traditional build: respect WINEARCH
+    if [ "$WINEARCH" = "win32" ]; then
+        if [ -f "/app/wine/${WINE_VERSION}/bin32/${BIN_NAME}" ]; then
+            BIN="/app/wine/${WINE_VERSION}/bin32/${BIN_NAME}"
+            WINE="/app/wine/${WINE_VERSION}/bin32/wine"
+        else
+            BIN="${WINE_BIN}/${BIN_NAME}"
+            WINE="${WINE_BIN}/wine"
+        fi
+    else
+        # Default to 64-bit
+        if [ -f "${WINE_BIN}/${BIN_NAME}64" ]; then
+            BIN="${WINE_BIN}/${BIN_NAME}64"
+        else
+            BIN="${WINE_BIN}/${BIN_NAME}"
+        fi
+        WINE="${WINE_BIN}/wine64"
     fi
 else
-    if [ -f "/app/wine/${WINE_VERSION}/bin/wine64" ] && [ -f "/app/wine/${WINE_VERSION}/bin/${BIN_NAME}64" ]; then
-        BIN="/app/wine/${WINE_VERSION}/bin/${BIN_NAME}64"
-        WINE="/app/wine/${WINE_VERSION}/bin/wine64"
-    else
-        BIN="/app/wine/${WINE_VERSION}/bin/${BIN_NAME}"
-        WINE="/app/wine/${WINE_VERSION}/bin/wine"
-    fi
-fi
-export WINE
-echo "Using Wine: $WINE"
-
-# Validate Wine installation
-if [ ! -x "$BIN" ]; then
-    echo "Error: Wine version ${WINE_VERSION} not found at ${BIN}" >&2
-    echo "Available versions:" >&2
-    ls -1 /app/wine/ 2>/dev/null || echo "  (none installed)" >&2
-    echo "" >&2
-    echo "Set WINE_VERSION environment variable to select a different version." >&2
-    echo "Example: WINE_VERSION=wine-10 ${BIN} <args>" >&2
+    AVAILABLE=$(ls -1 /app/wine/ 2>/dev/null | tr '\n' ', ' | sed 's/,$//' || echo "none")
+    zenity --error --title="Wine Not Found" \
+        --text="Wine version <b>${WINE_VERSION}</b> not found.\n\nAvailable versions: ${AVAILABLE}" \
+        --width=400
     exit 1
 fi
 
-# Execute wine with all arguments
+export WINE
+
+# Check prefix compatibility (only if prefix exists)
+PREFIX_ARCH=$(get_prefix_arch)
+if [ "$PREFIX_ARCH" != "none" ] && [ "$PREFIX_ARCH" != "unknown" ]; then
+    if [ "$WINE_TYPE" = "wow64" ] && [ "$PREFIX_ARCH" = "win32" ]; then
+        zenity --error --title="Wine Architecture Error" \
+            --text="WoW64 Wine requires a 64-bit prefix, but the existing prefix is 32-bit.\n\nTo fix this, remove the Wine prefix:\n<tt>rm -rf $WINEPREFIX</tt>" \
+            --width=400
+        exit 1
+    fi
+    if [ "$WINEARCH" = "win32" ] && [ "$PREFIX_ARCH" = "win64" ]; then
+        zenity --error --title="Wine Architecture Error" \
+            --text="WINEARCH is set to win32, but the existing prefix is 64-bit.\n\nRemove the prefix or change WINEARCH." \
+            --width=400
+        exit 1
+    fi
+    if [ "$WINEARCH" = "win64" ] && [ "$PREFIX_ARCH" = "win32" ]; then
+        zenity --error --title="Wine Architecture Error" \
+            --text="WINEARCH is set to win64, but the existing prefix is 32-bit.\n\nRemove the prefix or change WINEARCH." \
+            --width=400
+        exit 1
+    fi
+fi
+
+# Validate Wine binary exists
+if [ ! -x "$BIN" ]; then
+    AVAILABLE=$(ls -1 /app/wine/ 2>/dev/null | tr '\n' ', ' | sed 's/,$//' || echo "none")
+    zenity --error --title="Wine Not Found" \
+        --text="Wine version <b>${WINE_VERSION}</b> not found.\n\nAvailable versions: ${AVAILABLE}\n\nSet WINE_VERSION environment variable to select a different version." \
+        --width=400
+    exit 1
+fi
+
+echo "Using Wine: $WINE (${WINE_TYPE})"
 exec "$BIN" "$@"

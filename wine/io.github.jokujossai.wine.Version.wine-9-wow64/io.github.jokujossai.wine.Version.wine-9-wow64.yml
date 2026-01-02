@@ -1,0 +1,97 @@
+id: io.github.jokujossai.wine.Version.wine-9-wow64
+branch: '25.08'
+runtime: io.github.jokujossai.wine.base
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk//25.08
+build-extension: true
+separate-locales: false
+appstream-compose: false
+
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.mingw-w64
+
+build-options:
+  prefix: /app/wine/wine-9-wow64
+  prepend-path: /app/wine/wine-9-wow64/bin
+  append-path: /usr/lib/sdk/mingw-w64/bin
+  cflags: -std=gnu17
+  cxxflags: -std=gnu++17
+
+modules:
+
+  # Wine (WoW64 unified build)
+
+  - name: wine
+    config-opts:
+      - --enable-archs=i386,x86_64
+      - --disable-tests
+      - --with-x
+      - --with-pulse
+      - --with-dbus
+      - --without-hal
+      - --without-oss
+    make-install-args:
+      - LDCONFIG=/bin/true
+      - UPDATE_DESKTOP_DATABASE=/bin/true
+      - INSTALL_PROGRAM_FLAGS=-s
+    post-install:
+      - ln -sf /app/share/wine/gecko ${FLATPAK_DEST}/share/wine/gecko
+      - ln -sf /app/share/wine/mono ${FLATPAK_DEST}/share/wine/mono
+    sources:
+      - type: archive
+        url: https://dl.winehq.org/wine/source/9.x/wine-9.22.tar.xz
+        sha256: e150d29742aa54f768ef3e976ed861aaa4f9f48542e409bea902d0f49b359683
+        x-addons-url: >-
+          https://gitlab.winehq.org/wine/wine/-/raw/master/dlls/appwiz.cpl/addons.c
+        x-checker-data:
+          type: html
+          url: https://dl.winehq.org/wine/source/9.x/
+          version-pattern: wine-(\d+\.[\d.]+)\.tar\.xz
+          url-template: https://dl.winehq.org/wine/source/9.x/wine-$version.tar.xz
+          versions:
+            <: '10.0'
+          is-main-source: true
+
+  # Tools
+
+  - name: winetricks
+    no-autogen: true
+    make-install-args:
+      - PREFIX=${FLATPAK_DEST}
+    sources:
+      - type: git
+        url: https://github.com/Winetricks/winetricks.git
+        tag: '20250102'
+        commit: e20b2f6f80d175f96208f51800130db7459dd28c
+        x-checker-data:
+          type: git
+          tag-pattern: ^(\d+)$
+    modules:
+
+      - name: 7zip
+        buildsystem: simple
+        subdir: CPP/7zip/Bundles/Alone2
+        build-commands:
+          - make -j $FLATPAK_BUILDER_N_JOBS -f makefile.gcc
+          - install -Dm755 ./_o/7zz -t ${FLATPAK_DEST}/bin
+          - ln -s ${FLATPAK_DEST}/bin/7zz ${FLATPAK_DEST}/bin/7za
+          - ln -s ${FLATPAK_DEST}/bin/7zz ${FLATPAK_DEST}/bin/7z
+        sources:
+          - type: git
+            url: https://github.com/ip7z/7zip.git
+            tag: '25.01'
+            commit: 5e96a8279489832924056b1fa82f29d5837c9469
+            x-checker-data:
+              type: git
+              tag-pattern: ^([\d.]+)$
+
+      - name: cabextract
+        sources:
+          - type: archive
+            url: https://www.cabextract.org.uk/cabextract-1.11.tar.gz
+            sha256: b5546db1155e4c718ff3d4b278573604f30dd64c3c5bfd4657cd089b823a3ac6
+            x-checker-data:
+              type: anitya
+              project-id: 245
+              stable-only: true
+              url-template: https://www.cabextract.org.uk/cabextract-$version.tar.gz
