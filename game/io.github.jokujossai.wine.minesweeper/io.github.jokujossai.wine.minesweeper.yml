@@ -41,6 +41,8 @@ modules:
       - install -Dm644 io.github.jokujossai.wine.minesweeper.desktop /app/share/applications/io.github.jokujossai.wine.minesweeper.desktop
       - install -Dm644 io.github.jokujossai.wine.minesweeper.metainfo.xml /app/share/metainfo/io.github.jokujossai.wine.minesweeper.metainfo.xml
       - install -Dm644 icon.png /app/share/icons/hicolor/128x128/apps/io.github.jokujossai.wine.minesweeper.png
+      - install -Dm755 wine-backup.sh /app/bin/wine-backup.sh
+      - install -Dm755 wine-restore.sh /app/bin/wine-restore.sh
     sources:
       # Minesweeper executable (from Windows XP via archive.org)
       - type: file
@@ -59,3 +61,9 @@ modules:
 
       - type: file
         path: icon.png
+
+      - type: file
+        path: wine-backup.sh
+
+      - type: file
+        path: wine-restore.sh

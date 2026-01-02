@@ -30,3 +30,6 @@ Thumbs.db
 
 # External games
 external_games/
+
+# Wine files
+*.reg
