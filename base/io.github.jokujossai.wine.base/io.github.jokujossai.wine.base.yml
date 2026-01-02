@@ -90,9 +90,11 @@ add-extensions:
     no-autodownload: true
 
   io.github.jokujossai.wine.mono:
-    directory: share/wine/mono
+    subdirectories: true
+    directory: share/wine
     version: stable
     no-autodownload: true
+    merge-dirs: mono
 
   io.github.jokujossai.gamescope:
     directory: extensions/gamescope

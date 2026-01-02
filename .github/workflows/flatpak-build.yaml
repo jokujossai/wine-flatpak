@@ -86,9 +86,21 @@ jobs:
             id: io.github.jokujossai.wine.gecko
             manifest: extension/io.github.jokujossai.wine.gecko/io.github.jokujossai.wine.gecko.yml
             branch: stable
-          - name: mono
-            id: io.github.jokujossai.wine.mono
-            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.yml
+          - name: mono81
+            id: io.github.jokujossai.wine.mono.mono81
+            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono81.yml
+            branch: stable
+          - name: mono93
+            id: io.github.jokujossai.wine.mono.mono93
+            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono93.yml
+            branch: stable
+          - name: mono103
+            id: io.github.jokujossai.wine.mono.mono103
+            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono103.yml
+            branch: stable
+          - name: mono104
+            id: io.github.jokujossai.wine.mono.mono104
+            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono104.yml
             branch: stable
           - name: minesweeper
             id: io.github.jokujossai.wine.minesweeper

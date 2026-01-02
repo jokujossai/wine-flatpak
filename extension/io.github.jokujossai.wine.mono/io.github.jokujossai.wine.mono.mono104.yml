@@ -1,0 +1,32 @@
+id: io.github.jokujossai.wine.mono.mono104
+branch: stable
+runtime: io.github.jokujossai.wine.base
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk//25.08
+build-extension: true
+separate-locales: false
+appstream-compose: false
+
+build-options:
+  prefix: /app
+
+modules:
+  - name: wine-mono
+    buildsystem: simple
+    build-commands:
+      - mkdir -p ${FLATPAK_DEST}/mono/
+      - cp -a wine-mono-* ${FLATPAK_DEST}/mono/
+    sources:
+      - type: archive
+        url: https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.tar.xz
+        strip-components: 0
+        sha256: a16606ef0724202e6a6848ece6e0cbba64d11e2f11aefe744af1d93c6d9f99bb
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/wine-mono/wine-mono/releases
+          versions:
+            "<": "10.5.0"
+          version-query: '[.[] | select(.tag_name | test("^wine-mono-10\\.4"))][0].tag_name
+            | sub("^wine-mono-"; "")'
+          url-query: '"https://dl.winehq.org/wine/wine-mono/" + $version + "/wine-mono-"
+            + $version + "-x86.tar.xz"'
