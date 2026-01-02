@@ -38,7 +38,10 @@ flatpak run io.github.jokujossai.wine.minesweeper
 | Wine 9 WoW64 | `io.github.jokujossai.wine.Version.wine-9-wow64` | Wine 9.x (unified WoW64 build) |
 | Gamescope | `io.github.jokujossai.gamescope` | Upscaling compositor |
 | Gecko | `io.github.jokujossai.wine.gecko` | IE compatibility |
-| Mono | `io.github.jokujossai.wine.mono` | .NET compatibility |
+| Mono 8.1 | `io.github.jokujossai.wine.mono.mono81` | .NET for Wine 8.x |
+| Mono 9.3 | `io.github.jokujossai.wine.mono.mono93` | .NET for Wine 9.x |
+| Mono 10.3 | `io.github.jokujossai.wine.mono.mono103` | .NET for Wine 10.x |
+| Mono 10.4 | `io.github.jokujossai.wine.mono.mono104` | .NET for Wine 11.x |
 | Minesweeper | `io.github.jokujossai.wine.minesweeper` | Example game |
 
 ## Building from Source
@@ -97,6 +100,9 @@ flatpak run --env=WINEDEBUG=+all io.github.jokujossai.wine.{game}
 
 # Shell access
 flatpak run --devel --command=bash io.github.jokujossai.wine.{game}
+
+# Reset Wine prefix (preserves game saves if backup script exists)
+flatpak run io.github.jokujossai.wine.{game} --reset
 ```
 
 ## License

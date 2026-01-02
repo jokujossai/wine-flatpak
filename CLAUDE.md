@@ -98,12 +98,22 @@ fullscreen=0
 ```
 
 The entrypoint:
-1. Reads `config.ini`
-2. Initializes Wine prefix on first run
-3. Sets Windows version if specified
-4. Sets up D: drive if ISO contents exist
-5. Shows installer dialog if game not installed
-6. Launches game via `wine-desktop` wrapper
+1. Handles `--reset` argument (backup, remove prefix, restore on next run)
+2. Reads `config.ini`
+3. Initializes Wine prefix on first run
+4. Sets Windows version if specified
+5. Runs optional `/app/bin/wine-restore.sh` after prefix creation
+6. Sets up D: drive if ISO contents exist
+7. Shows installer dialog if game not installed
+8. Launches game via `wine-desktop` wrapper
+
+### Backup/Restore Scripts (Optional)
+
+Games can provide optional scripts to preserve saves during `--reset`:
+- `/app/bin/wine-backup.sh` - Called before removing Wine prefix
+- `/app/bin/wine-restore.sh` - Called after creating new Wine prefix
+
+Example (minesweeper backs up registry high scores to `/var/data/winmine-backup.reg`).
 
 ## Common Tasks
 
@@ -174,18 +184,20 @@ inherit-extensions:
   - io.github.jokujossai.wine.gecko
   - io.github.jokujossai.wine.mono
   - io.github.jokujossai.gamescope
+  - io.github.jokujossai.wine.Version  # All Wine versions (wine-9, wine-10, wow64 variants)
 ```
 
-### Game-Specific Extensions
-Games add their Wine version extension:
+### Wine Versions Available
+- `io.github.jokujossai.wine.Version.wine-9` - Wine 9.x (traditional)
+- `io.github.jokujossai.wine.Version.wine-10` - Wine 10.x (traditional)
+- `io.github.jokujossai.wine.Version.wine-9-wow64` - Wine 9.x (WoW64 unified)
+- `io.github.jokujossai.wine.Version.wine-10-wow64` - Wine 10.x (WoW64 unified)
 
-```yaml
-add-extensions:
-  io.github.jokujossai.wine.Version.wine-10:
-    directory: wine/wine-10
-    version: '25.08'
-    add-ld-path: lib
-```
+### Mono Extensions (multi-version)
+- `io.github.jokujossai.wine.mono.mono81` - Wine Mono 8.1.x (Wine 8.x)
+- `io.github.jokujossai.wine.mono.mono93` - Wine Mono 9.3.x (Wine 9.x)
+- `io.github.jokujossai.wine.mono.mono103` - Wine Mono 10.3.x (Wine 10.x)
+- `io.github.jokujossai.wine.mono.mono104` - Wine Mono 10.4.x (Wine 11.x)
 
 ## Game Manifest Template
 
@@ -205,12 +217,7 @@ inherit-extensions:
   - io.github.jokujossai.wine.gecko
   - io.github.jokujossai.wine.mono
   - io.github.jokujossai.gamescope
-
-add-extensions:
-  io.github.jokujossai.wine.Version.wine-10:
-    directory: wine/wine-10
-    version: '25.08'
-    add-ld-path: lib
+  - io.github.jokujossai.wine.Version
 
 finish-args:
   - --share=ipc
@@ -231,7 +238,6 @@ modules:
       - install -Dm644 *.desktop /app/share/applications/
       - install -Dm644 *.metainfo.xml /app/share/metainfo/
       - install -Dm644 icon.png /app/share/icons/hicolor/128x128/apps/{app-id}.png
-      - mkdir -p /app/wine/wine-10
     sources:
       - type: file
         url: https://example.com/game.exe
@@ -305,27 +311,19 @@ Each game has isolated Wine prefix:
 2. Set Source to "GitHub Actions"
 3. Optional: Configure custom domain
 
-### Required Ed25519 Signing Configuration
+### Required GPG Signing Configuration
 
-Generate keys:
-```bash
-# Generate Ed25519 key pair
-openssl genpkey -algorithm ed25519 -out private.pem
-openssl pkey -in private.pem -pubout -out public.pem
-
-# Extract raw 32-byte keys and convert to base64
-openssl pkey -in private.pem -outform DER | tail -c 32 | base64 -w0  # ED25519_PRIVATE_KEY (secret)
-openssl pkey -in public.pem -pubin -outform DER | tail -c 32 | base64 -w0  # ED25519_PUBLIC_KEY (variable)
-
-# Clean up
-rm private.pem public.pem
-```
+The workflow uses GPG signing for the Flatpak repository.
 
 Variables (Settings → Secrets and variables → Actions → Variables):
-- `ED25519_PUBLIC_KEY` - Base64-encoded 32-byte public key
+- `GPG_KEY_ID` - GPG key ID for signing
+- `GPG_KEY_GREP` - Key grip for passphrase preset
+- `APP_ID` - GitHub App ID for automated PRs
 
 Secrets (Settings → Secrets and variables → Actions → Secrets):
-- `ED25519_PRIVATE_KEY` - Base64-encoded 32-byte private key
+- `GPG_PRIVATE_KEY` - ASCII-armored GPG private key
+- `GPG_PASSPHRASE` - GPG key passphrase
+- `APP_PRIVATE_KEY` - GitHub App private key
 
 ### Using the Published Repository
 ```bash

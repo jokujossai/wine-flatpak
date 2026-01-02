@@ -8,6 +8,11 @@ set -e
 if [ "$1" = "--reset" ]; then
     shift
     if [ -d "$WINEPREFIX" ]; then
+        # Run optional backup script before removing prefix
+        if [ -x "/app/bin/wine-backup.sh" ]; then
+            echo "Running backup script..."
+            /app/bin/wine-backup.sh
+        fi
         echo "Removing Wine prefix: $WINEPREFIX"
         rm -rf "$WINEPREFIX"
         echo "Wine prefix removed. Starting fresh..."
@@ -59,6 +64,12 @@ if [ ! -d "$WINEPREFIX" ]; then
                 --text="Winetricks-ohjelmaa ei löydy.\n\nWindows-versiota '$WINDOWS_VERSION' ei voitu asettaa.\n\nPeli saattaa toimia väärin." \
                 --width=400
         fi
+    fi
+
+    # Run optional restore script after prefix creation
+    if [ -x "/app/bin/wine-restore.sh" ]; then
+        echo "Running restore script..."
+        /app/bin/wine-restore.sh
     fi
 
     echo "Wine prefix initialized at $WINEPREFIX"
