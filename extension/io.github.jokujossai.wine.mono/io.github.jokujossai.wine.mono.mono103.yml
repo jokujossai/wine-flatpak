@@ -8,20 +8,24 @@ separate-locales: false
 appstream-compose: false
 
 build-options:
-  prefix: /app/share/wine/mono/wine-mono-10.3.0
+  prefix: /app
 
 modules:
   - name: wine-mono
     buildsystem: simple
     build-commands:
-      - cp -a * ${FLATPAK_DEST}/
+      - mkdir -p ${FLATPAK_DEST}/mono/
+      - cp -a wine-mono-* ${FLATPAK_DEST}/mono/
     sources:
       - type: archive
         url: https://dl.winehq.org/wine/wine-mono/10.3.0/wine-mono-10.3.0-x86.tar.xz
+        strip-components: 0
         sha256: 009651c4baa2c5010c70aa28728a85e24a04485ff0e22b8cd5eea4eb8959e72e
         x-checker-data:
           type: json
           url: https://api.github.com/repos/wine-mono/wine-mono/releases
+          versions:
+            "<": "10.4.0"
           version-query: '[.[] | select(.tag_name | test("^wine-mono-10\\.3"))][0].tag_name
             | sub("^wine-mono-"; "")'
           url-query: '"https://dl.winehq.org/wine/wine-mono/" + $version + "/wine-mono-"

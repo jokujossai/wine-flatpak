@@ -8,20 +8,24 @@ separate-locales: false
 appstream-compose: false
 
 build-options:
-  prefix: /app/share/wine/mono/wine-mono-8.1.0
+  prefix: /app
 
 modules:
   - name: wine-mono
     buildsystem: simple
     build-commands:
-      - cp -a * ${FLATPAK_DEST}/
+      - mkdir -p ${FLATPAK_DEST}/mono/
+      - cp -a wine-mono-* ${FLATPAK_DEST}/mono/
     sources:
       - type: archive
         url: https://dl.winehq.org/wine/wine-mono/8.1.0/wine-mono-8.1.0-x86.tar.xz
+        strip-components: 0
         sha256: 4e3e8a40729e4c9e3e9e651cebe4f1aed8f9a4d22e991e6cd24608687f0eedd4
         x-checker-data:
           type: json
           url: https://api.github.com/repos/wine-mono/wine-mono/releases
+          versions:
+            "<": "8.2.0"
           version-query: '[.[] | select(.tag_name | test("^wine-mono-8\\."))][0].tag_name
             | sub("^wine-mono-"; "")'
           url-query: '"https://dl.winehq.org/wine/wine-mono/" + $version + "/wine-mono-"
