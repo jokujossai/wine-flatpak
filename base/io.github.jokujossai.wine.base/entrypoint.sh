@@ -4,6 +4,16 @@
 
 set -e
 
+# Handle --reset argument to remove Wine prefix and start fresh
+if [ "$1" = "--reset" ]; then
+    shift
+    if [ -d "$WINEPREFIX" ]; then
+        echo "Removing Wine prefix: $WINEPREFIX"
+        rm -rf "$WINEPREFIX"
+        echo "Wine prefix removed. Starting fresh..."
+    fi
+fi
+
 CONFIG_FILE="/app/config.ini"
 
 # Read config.ini

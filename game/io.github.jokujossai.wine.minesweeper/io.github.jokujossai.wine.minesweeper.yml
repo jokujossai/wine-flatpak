@@ -32,6 +32,18 @@ add-extensions:
     add-ld-path: lib
     no-autodownload: true
 
+  io.github.jokujossai.wine.Version.wine-9-wow64:
+    directory: wine/wine-9-wow64
+    version: '25.08'
+    add-ld-path: lib
+    no-autodownload: true
+
+  io.github.jokujossai.wine.Version.wine-10-wow64:
+    directory: wine/wine-10-wow64
+    version: '25.08'
+    add-ld-path: lib
+    no-autodownload: true
+
 finish-args:
   - --share=ipc
   - --socket=x11
@@ -56,6 +68,8 @@ modules:
       # Create extension mount points
       - mkdir -p /app/wine/wine-9
       - mkdir -p /app/wine/wine-10
+      - mkdir -p /app/wine/wine-9-wow64
+      - mkdir -p /app/wine/wine-10-wow64
     sources:
       # Minesweeper executable (from Windows XP via archive.org)
       - type: file
