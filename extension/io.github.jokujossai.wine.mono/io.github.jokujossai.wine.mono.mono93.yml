@@ -1,0 +1,28 @@
+id: io.github.jokujossai.wine.mono.mono93
+branch: stable
+runtime: io.github.jokujossai.wine.base
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk//25.08
+build-extension: true
+separate-locales: false
+appstream-compose: false
+
+build-options:
+  prefix: /app/share/wine/mono/wine-mono-9.3.0
+
+modules:
+  - name: wine-mono
+    buildsystem: simple
+    build-commands:
+      - cp -a * ${FLATPAK_DEST}/
+    sources:
+      - type: archive
+        url: https://dl.winehq.org/wine/wine-mono/9.3.0/wine-mono-9.3.0-x86.tar.xz
+        sha256: c23deb9e3217a574f242b78d74cb94c4948a37d1f2715941b803a02e535854a6
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/wine-mono/wine-mono/releases
+          version-query: '[.[] | select(.tag_name | test("^wine-mono-9\\."))][0].tag_name
+            | sub("^wine-mono-"; "")'
+          url-query: '"https://dl.winehq.org/wine/wine-mono/" + $version + "/wine-mono-"
+            + $version + "-x86.tar.xz"'

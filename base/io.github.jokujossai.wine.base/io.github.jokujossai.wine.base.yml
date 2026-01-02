@@ -90,6 +90,7 @@ add-extensions:
     no-autodownload: true
 
   io.github.jokujossai.wine.mono:
+    subdirectories: true
     directory: share/wine/mono
     version: stable
     no-autodownload: true

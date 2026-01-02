@@ -19,7 +19,10 @@ jobs:
           - wine/io.github.jokujossai.wine.Version.wine-10-wow64/io.github.jokujossai.wine.Version.wine-10-wow64.yml
           - extension/io.github.jokujossai.gamescope/io.github.jokujossai.gamescope.yml
           - extension/io.github.jokujossai.wine.gecko/io.github.jokujossai.wine.gecko.yml
-          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.yml
+          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono81.yml
+          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono93.yml
+          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono103.yml
+          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono104.yml
     steps:
       - name: Generate app token
         uses: actions/create-github-app-token@v2
