@@ -34,9 +34,9 @@ modules:
         url: https://bitmath.org/code/mtdev/mtdev-1.1.7.tar.bz2
         sha256: a107adad2101fecac54ac7f9f0e0a0dd155d954193da55c2340c97f2ff1d814e
         x-checker-data:
-          type: anitya
-          project-id: 8868
-          stable-only: true
+          type: html
+          url: https://bitmath.org/code/mtdev/
+          version-pattern: mtdev-([\d.]+)\.tar\.bz2
           url-template: https://bitmath.org/code/mtdev/mtdev-$version.tar.bz2
       # Upstream uses an outdated version of the config.guess/config.sub script,
       # so we override it here to fix aarch64 builds.
