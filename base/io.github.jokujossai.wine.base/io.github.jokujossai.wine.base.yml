@@ -217,7 +217,8 @@ modules:
           type: json
           url: https://api.github.com/repos/KhronosGroup/OpenCL-Headers/releases/latest
           version-query: .tag_name | sub("^v"; "")
-          url-query: '"https://github.com/KhronosGroup/OpenCL-Headers/archive/refs/tags/v" + $version + ".tar.gz"'
+          url-query: '"https://github.com/KhronosGroup/OpenCL-Headers/archive/refs/tags/v"
+            + $version + ".tar.gz"'
 
   # Samba + dependencies - For ntlm_auth and other functionalities in Wine
 
@@ -250,7 +251,8 @@ modules:
           type: json
           url: https://api.github.com/repos/thkukuk/rpcsvc-proto/releases/latest
           version-query: .tag_name | sub("^v"; "")
-          url-query: '"https://github.com/thkukuk/rpcsvc-proto/releases/download/v" + $version + "/rpcsvc-proto-" + $version + ".tar.xz"'
+          url-query: '"https://github.com/thkukuk/rpcsvc-proto/releases/download/v"
+            + $version + "/rpcsvc-proto-" + $version + ".tar.xz"'
 
   - name: samba
     build-options:
@@ -281,8 +283,8 @@ modules:
       - --without-dmapi
     sources: &samba-sources
       - type: archive
-        url: https://samba.org/samba/ftp/stable/samba-4.23.4.tar.gz
-        sha256: af429d078a86f1ce16d0d1ecee35c42a3610790b47b84468f31284a8c4060140
+        url: https://samba.org/samba/ftp/stable/samba-4.23.5.tar.gz
+        sha256: 593a43ddd0d57902237dfa76888f7b02cb7fc7747111369cb31e126db4836b9f
         x-checker-data:
           type: html
           url: https://samba.org/samba/ftp/stable/
@@ -314,8 +316,8 @@ modules:
     buildsystem: meson
     sources:
       - type: archive
-        url: https://download.gnome.org/sources/zenity/3.44/zenity-3.44.2.tar.xz
-        sha256: 3fb5b8b1044d3d129262d3c54cf220eb7f76bc21bd5ac6d96ec115cd3518300e
+        url: https://download.gnome.org/sources/zenity/3.99/zenity-3.99.91.tar.xz
+        sha256: e8c80ae1e2a4d7b2eb39c4fb8c4b14814530f37997b49f4c184bf2f7124d84d2
         x-checker-data:
           type: gnome
           name: zenity
