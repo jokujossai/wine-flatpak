@@ -6,23 +6,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-updates:
+  discover-manifests:
     if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    outputs:
+      manifests: ${{ steps.find-manifests.outputs.manifests }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Find manifests
+        id: find-manifests
+        run: |
+          manifests=$(find base/io.github.jokujossai.*/io.github.jokujossai.*.yml \
+                           wine/io.github.jokujossai.*/io.github.jokujossai.*.yml \
+                           extension/io.github.jokujossai.*/io.github.jokujossai.*.yml \
+                           2>/dev/null | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "manifests=$manifests" >> "$GITHUB_OUTPUT"
+          echo "Found manifests:"
+          echo "$manifests" | jq -r '.[]'
+
+  check-updates:
+    needs: discover-manifests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        manifest:
-          - wine/io.github.jokujossai.wine.Version.wine-9/io.github.jokujossai.wine.Version.wine-9.yml
-          - wine/io.github.jokujossai.wine.Version.wine-10/io.github.jokujossai.wine.Version.wine-10.yml
-          - wine/io.github.jokujossai.wine.Version.wine-9-wow64/io.github.jokujossai.wine.Version.wine-9-wow64.yml
-          - wine/io.github.jokujossai.wine.Version.wine-10-wow64/io.github.jokujossai.wine.Version.wine-10-wow64.yml
-          - extension/io.github.jokujossai.gamescope/io.github.jokujossai.gamescope.yml
-          - extension/io.github.jokujossai.wine.gecko/io.github.jokujossai.wine.gecko.yml
-          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono81.yml
-          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono93.yml
-          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono103.yml
-          - extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono104.yml
+        manifest: ${{ fromJson(needs.discover-manifests.outputs.manifests) }}
     steps:
       - name: Generate app token
         uses: actions/create-github-app-token@v2
