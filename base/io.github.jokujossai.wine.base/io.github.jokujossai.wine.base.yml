@@ -214,9 +214,9 @@ modules:
         url: https://github.com/KhronosGroup/OpenCL-Headers/archive/refs/tags/v2025.07.22.tar.gz
         sha256: 98f0a3ea26b4aec051e533cb1750db2998ab8e82eda97269ed6efe66ec94a240
         x-checker-data:
-          type: anitya
-          project-id: 223257
-          stable-only: true
+          type: git
+          url: https://github.com/KhronosGroup/OpenCL-Headers.git
+          tag-pattern: ^v([\d.]+)$
           url-template: https://github.com/KhronosGroup/OpenCL-Headers/archive/refs/tags/v$version.tar.gz
 
   # Samba + dependencies - For ntlm_auth and other functionalities in Wine
@@ -247,9 +247,9 @@ modules:
         url: https://github.com/thkukuk/rpcsvc-proto/releases/download/v1.4.4/rpcsvc-proto-1.4.4.tar.xz
         sha256: 81c3aa27edb5d8a18ef027081ebb984234d5b5860c65bd99d4ac8f03145a558b
         x-checker-data:
-          type: anitya
-          project-id: 155452
-          stable-only: true
+          type: git
+          url: https://github.com/thkukuk/rpcsvc-proto.git
+          tag-pattern: ^v([\d.]+)$
           url-template: https://github.com/thkukuk/rpcsvc-proto/releases/download/v$version/rpcsvc-proto-$version.tar.xz
 
   - name: samba
