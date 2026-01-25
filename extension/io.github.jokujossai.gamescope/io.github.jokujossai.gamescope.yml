@@ -25,10 +25,10 @@ modules:
         url: https://github.com/vcrhonek/hwdata/archive/v0.402/hwdata-0.402.tar.gz
         sha256: e390fe2f5f5ef7ed9ccbe62eb7cd40d4ee2b57389e7869c0dc96433c81812e7a
         x-checker-data:
-          type: git
-          tag-pattern: ^v([\d.]+)$
-          url: https://github.com/vcrhonek/hwdata.git
-          url-template: https://github.com/vcrhonek/hwdata/archive/v$version/hwdata-$version.tar.gz
+          type: json
+          url: https://api.github.com/repos/vcrhonek/hwdata/releases/latest
+          version-query: .tag_name | sub("^v"; "")
+          url-query: '"https://github.com/vcrhonek/hwdata/archive/v" + $version + "/hwdata-" + $version + ".tar.gz"'
     post-install:
       - mkdir -p -m 755 ${FLATPAK_DEST}/lib/pkgconfig
       - install -m 644 ${FLATPAK_DEST}/share/pkgconfig/hwdata.pc ${FLATPAK_DEST}/lib/pkgconfig/
@@ -118,9 +118,10 @@ modules:
             url: https://github.com/google/benchmark/archive/v1.9.4/benchmark-1.9.4.tar.gz
             sha256: b334658edd35efcf06a99d9be21e4e93e092bd5f95074c1673d5c8705d95c104
             x-checker-data:
-              type: git
-              tag-pattern: ^v([\d.]+)$
-              url: https://github.com/google/benchmark.git
+              type: json
+              url: https://api.github.com/repos/google/benchmark/releases/latest
+              version-query: .tag_name | sub("^v"; "")
+              url-query: '"https://github.com/google/benchmark/archive/v" + $version + "/benchmark-" + $version + ".tar.gz"'
         cleanup:
           - /include
           - /lib/*.a

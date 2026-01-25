@@ -12,10 +12,10 @@ sources:
     url: https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.30.1/libinput-1.30.1.tar.gz
     sha256: 4339a2b9cc96ede3c120dedaedc61e48ce567808c5229e66587525ea972ef617
     x-checker-data:
-      type: git
-      url: https://gitlab.freedesktop.org/libinput/libinput.git
-      tag-pattern: ^([\d.]+)$
-      url-template: https://gitlab.freedesktop.org/libinput/libinput/-/archive/$version/libinput-$version.tar.gz
+      type: json
+      url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibinput/releases
+      version-query: first | .tag_name
+      url-query: '"https://gitlab.freedesktop.org/libinput/libinput/-/archive/" + $version + "/libinput-" + $version + ".tar.gz"'
 cleanup:
   - /bin
   - /etc

@@ -11,10 +11,10 @@ sources:
     url: https://gitlab.freedesktop.org/libinput/libei/-/archive/1.5.0/libei-1.5.0.tar.gz
     sha256: 7687c3bbcff89ff331c5db72e0a5cce6bcae382e3c238d6f7019a6bc71d88e43
     x-checker-data:
-      type: git
-      url: https://gitlab.freedesktop.org/libinput/libei.git
-      tag-pattern: ^([\d.]+)$
-      url-template: https://gitlab.freedesktop.org/libinput/libei/-/archive/$version/libei-$version.tar.gz
+      type: json
+      url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibei/releases
+      version-query: first | .tag_name
+      url-query: '"https://gitlab.freedesktop.org/libinput/libei/-/archive/" + $version + "/libei-" + $version + ".tar.gz"'
 modules:
   - name: python3-attrs
     buildsystem: simple
