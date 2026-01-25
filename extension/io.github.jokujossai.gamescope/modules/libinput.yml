@@ -12,10 +12,10 @@ sources:
     url: https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.30.1/libinput-1.30.1.tar.gz
     sha256: 4339a2b9cc96ede3c120dedaedc61e48ce567808c5229e66587525ea972ef617
     x-checker-data:
-      type: anitya
-      project-id: 5781
-      stable-only: true
-      url-template: https://gitlab.freedesktop.org/libinput/libinput/-/archive/$version/libinput-$version.tar.gz
+      type: json
+      url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibinput/releases
+      version-query: first | .tag_name
+      url-query: '"https://gitlab.freedesktop.org/libinput/libinput/-/archive/" + $version + "/libinput-" + $version + ".tar.gz"'
 cleanup:
   - /bin
   - /etc
@@ -34,9 +34,9 @@ modules:
         url: https://bitmath.org/code/mtdev/mtdev-1.1.7.tar.bz2
         sha256: a107adad2101fecac54ac7f9f0e0a0dd155d954193da55c2340c97f2ff1d814e
         x-checker-data:
-          type: anitya
-          project-id: 8868
-          stable-only: true
+          type: html
+          url: https://bitmath.org/code/mtdev/
+          version-pattern: mtdev-([\d.]+)\.tar\.bz2
           url-template: https://bitmath.org/code/mtdev/mtdev-$version.tar.bz2
       # Upstream uses an outdated version of the config.guess/config.sub script,
       # so we override it here to fix aarch64 builds.
