@@ -22,11 +22,9 @@ modules:
         strip-components: 0
         sha256: 009651c4baa2c5010c70aa28728a85e24a04485ff0e22b8cd5eea4eb8959e72e
         x-checker-data:
-          type: json
-          url: https://api.github.com/repos/wine-mono/wine-mono/releases
+          type: html
+          url: https://dl.winehq.org/wine/wine-mono/
           versions:
             "<": "10.4.0"
-          version-query: '[.[] | select(.tag_name | test("^wine-mono-10\\.3"))][0].tag_name
-            | sub("^wine-mono-"; "")'
-          url-query: '"https://dl.winehq.org/wine/wine-mono/" + $version + "/wine-mono-"
-            + $version + "-x86.tar.xz"'
+          version-pattern: href="(10\.3\.\d+)/"
+          url-template: https://dl.winehq.org/wine/wine-mono/$version/wine-mono-$version-x86.tar.xz
