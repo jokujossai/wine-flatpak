@@ -316,13 +316,13 @@ modules:
     buildsystem: meson
     sources:
       - type: archive
-        url: https://download.gnome.org/sources/zenity/3.99/zenity-3.99.91.tar.xz
-        sha256: e8c80ae1e2a4d7b2eb39c4fb8c4b14814530f37997b49f4c184bf2f7124d84d2
+        url: https://download.gnome.org/sources/zenity/3.44/zenity-3.44.2.tar.xz
+        sha256: 3fb5b8b1044d3d129262d3c54cf220eb7f76bc21bd5ac6d96ec115cd3518300e
         x-checker-data:
           type: gnome
           name: zenity
           versions:
-            <: '4.0'
+            <: '3.50'
 
   - name: 7zip
     buildsystem: simple
