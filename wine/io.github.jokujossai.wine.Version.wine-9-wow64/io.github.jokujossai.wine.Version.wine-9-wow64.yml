@@ -56,44 +56,4 @@ modules:
 
   # Tools
 
-  - name: winetricks
-    no-autogen: true
-    make-install-args:
-      - PREFIX=${FLATPAK_DEST}
-    sources:
-      - type: git
-        url: https://github.com/Winetricks/winetricks.git
-        tag: '20250102'
-        commit: e20b2f6f80d175f96208f51800130db7459dd28c
-        x-checker-data:
-          type: git
-          tag-pattern: ^(\d+)$
-    modules:
-
-      - name: 7zip
-        buildsystem: simple
-        subdir: CPP/7zip/Bundles/Alone2
-        build-commands:
-          - make -j $FLATPAK_BUILDER_N_JOBS -f makefile.gcc
-          - install -Dm755 ./_o/7zz -t ${FLATPAK_DEST}/bin
-          - ln -s ${FLATPAK_DEST}/bin/7zz ${FLATPAK_DEST}/bin/7za
-          - ln -s ${FLATPAK_DEST}/bin/7zz ${FLATPAK_DEST}/bin/7z
-        sources:
-          - type: git
-            url: https://github.com/ip7z/7zip.git
-            tag: '25.01'
-            commit: 5e96a8279489832924056b1fa82f29d5837c9469
-            x-checker-data:
-              type: git
-              tag-pattern: ^([\d.]+)$
-
-      - name: cabextract
-        sources:
-          - type: archive
-            url: https://www.cabextract.org.uk/cabextract-1.11.tar.gz
-            sha256: b5546db1155e4c718ff3d4b278573604f30dd64c3c5bfd4657cd089b823a3ac6
-            x-checker-data:
-              type: anitya
-              project-id: 245
-              stable-only: true
-              url-template: https://www.cabextract.org.uk/cabextract-$version.tar.gz
+  - ../modules/winetricks.yml
