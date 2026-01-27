@@ -16,6 +16,8 @@ build-options:
   append-path: /usr/lib/sdk/mingw-w64/bin
   cflags: -std=gnu17
   cxxflags: -std=gnu++17
+  config-opts:
+    - CROSSCFLAGS=-std=gnu17
 
 modules:
 
