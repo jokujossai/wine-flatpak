@@ -316,8 +316,8 @@ modules:
     buildsystem: meson
     sources:
       - type: archive
-        url: https://download.gnome.org/sources/zenity/3.44/zenity-3.44.2.tar.xz
-        sha256: 3fb5b8b1044d3d129262d3c54cf220eb7f76bc21bd5ac6d96ec115cd3518300e
+        url: https://download.gnome.org/sources/zenity/3.44/zenity-3.44.5.tar.xz
+        sha256: 29ac447f4246b1da783a3c28ddc80b0ef7c80eccd5836ad9140abf89841d0eab
         x-checker-data:
           type: gnome
           name: zenity
