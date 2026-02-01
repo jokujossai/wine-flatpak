@@ -14,7 +14,8 @@ sdk-extensions:
 
 x-compat-i386-opts: &compat_i386_opts
   prepend-pkg-config-path: ${FLATPAK_DEST}/lib32/pkgconfig:/usr/lib/i386-linux-gnu/pkgconfig
-  ldflags: -L${FLATPAK_DEST}/lib32 -Wl,-rpath-link=${FLATPAK_DEST}/lib32 -Wl,-z,relro,-z,now -Wl,--as-needed
+  ldflags: -L${FLATPAK_DEST}/lib32 -Wl,-rpath-link=${FLATPAK_DEST}/lib32 -Wl,-z,relro,-z,now
+    -Wl,--as-needed
   ldflags-override: true
   append-path: /usr/lib/sdk/toolchain-i386/bin
   env:
@@ -88,8 +89,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/Winetricks/winetricks.git
-        tag: '20250102'
-        commit: e20b2f6f80d175f96208f51800130db7459dd28c
+        tag: '20260125'
+        commit: b76e1ee79ac57d7aceb384f74518fc423265810c
         x-checker-data:
           type: git
           tag-pattern: ^(\d+)$
