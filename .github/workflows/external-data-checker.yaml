@@ -7,7 +7,6 @@ on:
 
 jobs:
   discover-manifests:
-    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     outputs:
       manifests: ${{ steps.find-manifests.outputs.manifests }}
@@ -61,4 +60,4 @@ jobs:
           GIT_COMMITTER_EMAIL: ${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         with:
-          args: --update --never-fork ${{ matrix.manifest }}
+          args: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && '--update' || '' }} --never-fork ${{ matrix.manifest }}
