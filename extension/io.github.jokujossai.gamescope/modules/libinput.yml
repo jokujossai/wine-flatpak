@@ -9,12 +9,12 @@ config-opts:
   - -Dzshcompletiondir=no
 sources:
   - type: archive
-    url: https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.30.901/libinput-1.30.901.tar.gz
-    sha256: 0717ca2227a03efbbc6ac5d1c0bd3410e2501d895c2e3753cb439faf4261b59f
+    url: https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.30.1/libinput-1.30.1.tar.gz
+    sha256: 4339a2b9cc96ede3c120dedaedc61e48ce567808c5229e66587525ea972ef617
     x-checker-data:
       type: json
       url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibinput/releases
-      version-query: first | .tag_name
+      version-query: '[.[] | select(.name | test("rc") | not)] | first | .tag_name'
       url-query: '"https://gitlab.freedesktop.org/libinput/libinput/-/archive/" +
         $version + "/libinput-" + $version + ".tar.gz"'
 cleanup:
