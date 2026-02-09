@@ -14,8 +14,9 @@ sources:
     x-checker-data:
       type: json
       url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibinput/releases
-      version-query: first | .tag_name
-      url-query: '"https://gitlab.freedesktop.org/libinput/libinput/-/archive/" + $version + "/libinput-" + $version + ".tar.gz"'
+      version-query: '[.[] | select(.name | test("rc") | not)] | first | .tag_name'
+      url-query: '"https://gitlab.freedesktop.org/libinput/libinput/-/archive/" +
+        $version + "/libinput-" + $version + ".tar.gz"'
 cleanup:
   - /bin
   - /etc
