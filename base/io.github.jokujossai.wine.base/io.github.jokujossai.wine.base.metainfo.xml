@@ -13,6 +13,9 @@
   <url type="homepage">https://github.com/jokujossai/wine-flatpak</url>
   <metadata_license>CC0-1.0</metadata_license>
   <releases>
+    <release version="2600" date="2026-02-12">
+      <description></description>
+    </release>
     <release version="25.08" date="2024-12-26"/>
   </releases>
 </component>
