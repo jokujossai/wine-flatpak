@@ -84,17 +84,12 @@ add-extensions:
     autodelete: false
     add-ld-path: lib
 
-  io.github.jokujossai.wine.gecko:
-    directory: share/wine/gecko
-    version: stable
-    no-autodownload: true
-
-  io.github.jokujossai.wine.mono:
+  io.github.jokujossai.wine.support:
     subdirectories: true
-    directory: share/wine
+    directory: share/wine/support
     version: stable
     no-autodownload: true
-    merge-dirs: mono
+    merge-dirs: gecko;mono
 
   io.github.jokujossai.gamescope:
     directory: extensions/gamescope
@@ -362,8 +357,8 @@ modules:
       - mkdir -p ${FLATPAK_DEST}/lib/debug/lib/i386-linux-gnu/GL
       - mkdir -p ${FLATPAK_DEST}/lib/i386-linux-gnu/dri/intel-vaapi-driver
       - mkdir -p ${FLATPAK_DEST}/i386/nvidia-vaapi-driver
-      - mkdir -p ${FLATPAK_DEST}/share/wine/gecko
-      - mkdir -p ${FLATPAK_DEST}/share/wine/mono
+      - mkdir -p ${FLATPAK_DEST}/share/wine/support/mono
+      - mkdir -p ${FLATPAK_DEST}/share/wine/support/gecko
       - mkdir -p ${FLATPAK_DEST}/extensions/gamescope
       - mkdir -p ${FLATPAK_DEST}/wine
       - install -Dm644 ${FLATPAK_ID}.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo

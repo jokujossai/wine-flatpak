@@ -23,8 +23,7 @@ io.github.jokujossai.wine.base (custom base runtime)
     ↓ uses as base              ↓ mounts extensions
 Game Flatpak                    io.github.jokujossai.wine.Version.wine-10
                                 io.github.jokujossai.gamescope
-                                io.github.jokujossai.wine.gecko
-                                io.github.jokujossai.wine.mono
+                                io.github.jokujossai.wine.support (gecko, mono)
 ```
 
 ### Components
@@ -178,8 +177,8 @@ wine/
 │   │       ├── libseat.yml
 │   │       ├── luajit.yml
 │   │       └── xwayland.yml
-│   ├── io.github.jokujossai.wine.gecko/
-│   └── io.github.jokujossai.wine.mono/
+│   ├── io.github.jokujossai.wine.support.gecko/
+│   └── io.github.jokujossai.wine.support.mono/
 │
 ├── game/
 │   └── io.github.jokujossai.wine.minesweeper/

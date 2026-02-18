@@ -1,4 +1,4 @@
-id: io.github.jokujossai.wine.mono.mono81
+id: io.github.jokujossai.wine.support.mono93
 branch: stable
 runtime: io.github.jokujossai.wine.base
 runtime-version: '25.08'
@@ -18,13 +18,13 @@ modules:
       - cp -a wine-mono-* ${FLATPAK_DEST}/mono/
     sources:
       - type: archive
-        url: https://dl.winehq.org/wine/wine-mono/8.1.0/wine-mono-8.1.0-x86.tar.xz
+        url: https://dl.winehq.org/wine/wine-mono/9.3.0/wine-mono-9.3.0-x86.tar.xz
         strip-components: 0
-        sha256: 4e3e8a40729e4c9e3e9e651cebe4f1aed8f9a4d22e991e6cd24608687f0eedd4
+        sha256: c23deb9e3217a574f242b78d74cb94c4948a37d1f2715941b803a02e535854a6
         x-checker-data:
           type: html
           url: https://dl.winehq.org/wine/wine-mono/
           versions:
-            "<": "8.2.0"
-          version-pattern: href="(8\.1\.\d+)/"
+            "<": "9.4.0"
+          version-pattern: href="(9\.3\.\d+)/"
           url-template: https://dl.winehq.org/wine/wine-mono/$version/wine-mono-$version-x86.tar.xz

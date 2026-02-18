@@ -1,4 +1,4 @@
-id: io.github.jokujossai.wine.mono.mono104
+id: io.github.jokujossai.wine.support.mono103
 branch: stable
 runtime: io.github.jokujossai.wine.base
 runtime-version: '25.08'
@@ -18,13 +18,13 @@ modules:
       - cp -a wine-mono-* ${FLATPAK_DEST}/mono/
     sources:
       - type: archive
-        url: https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.tar.xz
+        url: https://dl.winehq.org/wine/wine-mono/10.3.0/wine-mono-10.3.0-x86.tar.xz
         strip-components: 0
-        sha256: a16606ef0724202e6a6848ece6e0cbba64d11e2f11aefe744af1d93c6d9f99bb
+        sha256: 009651c4baa2c5010c70aa28728a85e24a04485ff0e22b8cd5eea4eb8959e72e
         x-checker-data:
           type: html
           url: https://dl.winehq.org/wine/wine-mono/
           versions:
-            "<": "10.5.0"
-          version-pattern: href="(10\.4\.\d+)/"
+            "<": "10.4.0"
+          version-pattern: href="(10\.3\.\d+)/"
           url-template: https://dl.winehq.org/wine/wine-mono/$version/wine-mono-$version-x86.tar.xz

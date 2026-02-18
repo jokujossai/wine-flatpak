@@ -17,8 +17,7 @@ io.github.jokujossai.wine.base
     ↓ uses as base              ↓ mounts extensions
 Game Flatpak                    io.github.jokujossai.wine.Version.wine-10
                                 io.github.jokujossai.gamescope
-                                io.github.jokujossai.wine.gecko
-                                io.github.jokujossai.wine.mono
+                                io.github.jokujossai.wine.support (gecko, mono)
 ```
 
 ### Components
@@ -26,7 +25,7 @@ Game Flatpak                    io.github.jokujossai.wine.Version.wine-10
 1. **Base Runtime** (`io.github.jokujossai.wine.base`): Wine dependencies + utilities
 2. **Wine Extension** (`io.github.jokujossai.wine.Version.wine-10`): Wine binaries
 3. **Gamescope Extension** (`io.github.jokujossai.gamescope`): Upscaling compositor
-4. **Gecko/Mono Extensions**: IE and .NET compatibility
+4. **Support Extension** (`io.github.jokujossai.wine.support`): Gecko (IE) and Mono (.NET) compatibility
 5. **Game Flatpaks**: Individual games using base + extensions
 
 ## Key Files and Locations
@@ -181,10 +180,9 @@ Games inherit these extensions from base via `inherit-extensions`:
 inherit-extensions:
   - org.freedesktop.Platform.Compat.i386
   - org.freedesktop.Platform.GL32
-  - io.github.jokujossai.wine.gecko
-  - io.github.jokujossai.wine.mono
+  - io.github.jokujossai.wine.support   # Gecko and Mono (IE/.NET compatibility)
   - io.github.jokujossai.gamescope
-  - io.github.jokujossai.wine.Version  # All Wine versions (wine-9, wine-10, wow64 variants)
+  - io.github.jokujossai.wine.Version   # All Wine versions (wine-9, wine-10, wow64 variants)
 ```
 
 ### Wine Versions Available
@@ -193,11 +191,17 @@ inherit-extensions:
 - `io.github.jokujossai.wine.Version.wine-9-wow64` - Wine 9.x (WoW64 unified)
 - `io.github.jokujossai.wine.Version.wine-10-wow64` - Wine 10.x (WoW64 unified)
 
-### Mono Extensions (multi-version)
-- `io.github.jokujossai.wine.mono.mono81` - Wine Mono 8.1.x (Wine 8.x)
-- `io.github.jokujossai.wine.mono.mono93` - Wine Mono 9.3.x (Wine 9.x)
-- `io.github.jokujossai.wine.mono.mono103` - Wine Mono 10.3.x (Wine 10.x)
-- `io.github.jokujossai.wine.mono.mono104` - Wine Mono 10.4.x (Wine 11.x)
+### Support Extensions (multi-version)
+The `io.github.jokujossai.wine.support` extension point provides both Gecko and Mono:
+
+**Gecko** (IE compatibility):
+- `io.github.jokujossai.wine.support.gecko` - Wine Gecko (Internet Explorer engine)
+
+**Mono** (.NET compatibility):
+- `io.github.jokujossai.wine.support.mono81` - Wine Mono 8.1.x (Wine 8.x)
+- `io.github.jokujossai.wine.support.mono93` - Wine Mono 9.3.x (Wine 9.x)
+- `io.github.jokujossai.wine.support.mono103` - Wine Mono 10.3.x (Wine 10.x)
+- `io.github.jokujossai.wine.support.mono104` - Wine Mono 10.4.x (Wine 11.x)
 
 ## Game Manifest Template
 
@@ -214,8 +218,7 @@ command: entrypoint.sh
 inherit-extensions:
   - org.freedesktop.Platform.Compat.i386
   - org.freedesktop.Platform.GL32
-  - io.github.jokujossai.wine.gecko
-  - io.github.jokujossai.wine.mono
+  - io.github.jokujossai.wine.support
   - io.github.jokujossai.gamescope
   - io.github.jokujossai.wine.Version
 

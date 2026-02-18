@@ -37,8 +37,8 @@ modules:
       - UPDATE_DESKTOP_DATABASE=/bin/true
       - INSTALL_PROGRAM_FLAGS=-s
     post-install:
-      - ln -sf /app/share/wine/gecko ${FLATPAK_DEST}/share/wine/gecko
-      - ln -sf /app/share/wine/mono ${FLATPAK_DEST}/share/wine/mono
+      - ln -sf /app/share/wine/support/gecko ${FLATPAK_DEST}/share/wine/gecko
+      - ln -sf /app/share/wine/support/mono ${FLATPAK_DEST}/share/wine/mono
     sources:
       - type: archive
         url: https://dl.winehq.org/wine/source/9.x/wine-9.22.tar.xz

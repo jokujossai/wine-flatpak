@@ -1,4 +1,4 @@
-id: io.github.jokujossai.wine.gecko
+id: io.github.jokujossai.wine.support.gecko
 branch: stable
 runtime: io.github.jokujossai.wine.base
 runtime-version: '25.08'
@@ -11,9 +11,8 @@ modules:
   - name: wine-gecko
     buildsystem: simple
     build-commands:
-      - mkdir -p ${FLATPAK_DEST}/
       - cp -a wine-gecko-* ${FLATPAK_DEST}/
-      - install -Dm644 io.github.jokujossai.wine.gecko.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/
+      - install -Dm644 io.github.jokujossai.wine.support.gecko.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/
     sources:
       - type: archive
         url: https://dl.winehq.org/wine/wine-gecko/2.47.4/wine-gecko-2.47.4-x86.tar.xz
@@ -34,4 +33,4 @@ modules:
           version-pattern: href="(\d+\.[\d.]+)/"
           url-template: https://dl.winehq.org/wine/wine-gecko/$version/wine-gecko-$version-x86_64.tar.xz
       - type: file
-        path: io.github.jokujossai.wine.gecko.metainfo.xml
+        path: io.github.jokujossai.wine.support.gecko.metainfo.xml

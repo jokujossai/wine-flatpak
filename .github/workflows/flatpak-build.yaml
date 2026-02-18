@@ -96,24 +96,24 @@ jobs:
             manifest: extension/io.github.jokujossai.gamescope/io.github.jokujossai.gamescope.yml
             branch: stable
           - name: gecko
-            id: io.github.jokujossai.wine.gecko
-            manifest: extension/io.github.jokujossai.wine.gecko/io.github.jokujossai.wine.gecko.yml
+            id: io.github.jokujossai.wine.support.gecko
+            manifest: extension/io.github.jokujossai.wine.support.gecko/io.github.jokujossai.wine.support.gecko.yml
             branch: stable
           - name: mono81
-            id: io.github.jokujossai.wine.mono.mono81
-            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono81.yml
+            id: io.github.jokujossai.wine.support.mono81
+            manifest: extension/io.github.jokujossai.wine.support.mono/io.github.jokujossai.wine.support.mono81.yml
             branch: stable
           - name: mono93
-            id: io.github.jokujossai.wine.mono.mono93
-            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono93.yml
+            id: io.github.jokujossai.wine.support.mono93
+            manifest: extension/io.github.jokujossai.wine.support.mono/io.github.jokujossai.wine.support.mono93.yml
             branch: stable
           - name: mono103
-            id: io.github.jokujossai.wine.mono.mono103
-            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono103.yml
+            id: io.github.jokujossai.wine.support.mono103
+            manifest: extension/io.github.jokujossai.wine.support.mono/io.github.jokujossai.wine.support.mono103.yml
             branch: stable
           - name: mono104
-            id: io.github.jokujossai.wine.mono.mono104
-            manifest: extension/io.github.jokujossai.wine.mono/io.github.jokujossai.wine.mono.mono104.yml
+            id: io.github.jokujossai.wine.support.mono104
+            manifest: extension/io.github.jokujossai.wine.support.mono/io.github.jokujossai.wine.support.mono104.yml
             branch: stable
           - name: minesweeper
             id: io.github.jokujossai.wine.minesweeper
@@ -327,8 +327,7 @@ jobs:
                 <li><code>io.github.jokujossai.wine.Version.wine-10</code> - Wine 10 extension</li>
                 <li><code>io.github.jokujossai.wine.Version.wine-10-wow64</code> - Wine 10 WoW64 extension</li>
                 <li><code>io.github.jokujossai.gamescope</code> - Gamescope compositor extension</li>
-                <li><code>io.github.jokujossai.wine.gecko</code> - Wine Gecko (IE compatibility)</li>
-                <li><code>io.github.jokujossai.wine.mono</code> - Wine Mono (.NET compatibility)</li>
+                <li><code>io.github.jokujossai.wine.support</code> - Wine support components (Gecko, Mono)</li>
               </ul>
 
               <h2>Source Code</h2>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="addon">
-  <id>io.github.jokujossai.wine.gecko</id>
+  <id>io.github.jokujossai.wine.support.gecko</id>
   <extends>io.github.jokujossai.wine</extends>
   <name>Gecko</name>
   <summary>Web engine for Wine based on Mozilla Gecko</summary>

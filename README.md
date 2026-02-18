@@ -37,11 +37,11 @@ flatpak run io.github.jokujossai.wine.minesweeper
 | Wine 9 | `io.github.jokujossai.wine.Version.wine-9` | Wine 9.x (for compatibility) |
 | Wine 9 WoW64 | `io.github.jokujossai.wine.Version.wine-9-wow64` | Wine 9.x (unified WoW64 build) |
 | Gamescope | `io.github.jokujossai.gamescope` | Upscaling compositor |
-| Gecko | `io.github.jokujossai.wine.gecko` | IE compatibility |
-| Mono 8.1 | `io.github.jokujossai.wine.mono.mono81` | .NET for Wine 8.x |
-| Mono 9.3 | `io.github.jokujossai.wine.mono.mono93` | .NET for Wine 9.x |
-| Mono 10.3 | `io.github.jokujossai.wine.mono.mono103` | .NET for Wine 10.x |
-| Mono 10.4 | `io.github.jokujossai.wine.mono.mono104` | .NET for Wine 11.x |
+| Gecko | `io.github.jokujossai.wine.support.gecko` | IE compatibility |
+| Mono 8.1 | `io.github.jokujossai.wine.support.mono81` | .NET for Wine 8.x |
+| Mono 9.3 | `io.github.jokujossai.wine.support.mono93` | .NET for Wine 9.x |
+| Mono 10.3 | `io.github.jokujossai.wine.support.mono103` | .NET for Wine 10.x |
+| Mono 10.4 | `io.github.jokujossai.wine.support.mono104` | .NET for Wine 11.x |
 | Minesweeper | `io.github.jokujossai.wine.minesweeper` | Example game |
 
 ## Building from Source
