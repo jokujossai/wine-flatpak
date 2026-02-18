@@ -29,7 +29,9 @@ Configuration:
 
   Config options:
     exe=<path>              Path to game executable (required)
-    installer=<path>        Path to installer for first-run setup
+    installer=<path>        Path to bundled installer for first-run setup
+    installer_filter=<glob> File filter for user-selected installer (e.g., *.exe)
+    installer_cdrom=<path>  Installer path relative to CD-ROM directory (e.g., SETUP.EXE)
     windows_version=<ver>   Windows version (e.g., winxp, win7, win10)
     output_width=<int>      Output resolution width
     output_height=<int>     Output resolution height
@@ -85,6 +87,8 @@ fi
 EXE=$(grep -E "^exe=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
 INSTALLER=$(grep -E "^installer=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
 WINDOWS_VERSION=$(grep -E "^windows_version=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
+INSTALLER_FILTER=$(grep -E "^installer_filter=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
+INSTALLER_CDROM=$(grep -E "^installer_cdrom=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
 
 # These can be overridden by environment variables
 _CFG_OUTPUT_WIDTH=$(grep -E "^output_width=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
@@ -157,8 +161,90 @@ if [ -n "$EXE" ] && [ -f "$EXE" ]; then
     fi
 fi
 
-# Game not installed - check for installer
-if [ -z "$INSTALLER" ]; then
+# Function to run installer
+run_installer() {
+    local installer_path="$1"
+
+    # Show pre-installation instructions
+    zenity --info \
+        --title="Pelin asennus" \
+        --text="Peli asennetaan nyt.\n\n<b>TÄRKEÄÄ:</b>\n• Käytä oletushakemistoa asennuksessa\n• ÄLÄ käynnistä peliä asennuksen jälkeen\n• Sulje asennusohjelma kun asennus on valmis" \
+        --width=500
+
+    echo "Running installer: $installer_path"
+    if [ -n "$OUTPUT_WIDTH" ] && [ -n "$OUTPUT_HEIGHT" ]; then
+        wine explorer.exe /desktop=installer,"${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}" "$installer_path"
+    else
+        wine "$installer_path"
+    fi
+}
+
+# Game not installed - determine installation method
+INSTALLER_PATH=""
+
+# Case 1: Bundled installer path specified
+if [ -n "$INSTALLER" ]; then
+    if [ ! -f "$INSTALLER" ]; then
+        zenity --error \
+            --title="Virhe" \
+            --text="Asennusohjelmaa ei löydy:\n$INSTALLER\n\nPeliä ei ole asennettu." \
+            --width=400
+        exit 1
+    fi
+    INSTALLER_PATH="$INSTALLER"
+
+# Case 2: User selects installer file
+elif [ -n "$INSTALLER_FILTER" ]; then
+    zenity --info \
+        --title="Pelin asennus" \
+        --text="Peliä ei ole asennettu.\n\nValitse asennusohjelman tiedosto seuraavassa ikkunassa." \
+        --width=400
+
+    INSTALLER_PATH=$(zenity --file-selection \
+        --title="Valitse asennusohjelma" \
+        --file-filter="Asennusohjelma | $INSTALLER_FILTER" \
+        2>/dev/null) || true
+
+    if [ -z "$INSTALLER_PATH" ]; then
+        zenity --error \
+            --title="Virhe" \
+            --text="Asennusta ei valittu.\n\nPeliä ei asennettu." \
+            --width=400
+        exit 1
+    fi
+
+# Case 3: User selects CD-ROM/installation directory
+elif [ -n "$INSTALLER_CDROM" ]; then
+    zenity --info \
+        --title="Pelin asennus" \
+        --text="Peliä ei ole asennettu.\n\nValitse pelin CD-ROM tai asennushakemisto seuraavassa ikkunassa." \
+        --width=400
+
+    CDROM_DIR=$(zenity --file-selection \
+        --title="Valitse asennushakemisto" \
+        --directory \
+        2>/dev/null) || true
+
+    if [ -z "$CDROM_DIR" ]; then
+        zenity --error \
+            --title="Virhe" \
+            --text="Hakemistoa ei valittu.\n\nPeliä ei asennettu." \
+            --width=400
+        exit 1
+    fi
+
+    INSTALLER_PATH="$CDROM_DIR/$INSTALLER_CDROM"
+
+    if [ ! -f "$INSTALLER_PATH" ]; then
+        zenity --error \
+            --title="Virhe" \
+            --text="Asennusohjelmaa ei löydy hakemistosta:\n$INSTALLER_PATH\n\nTarkista että valitsit oikean hakemiston." \
+            --width=500
+        exit 1
+    fi
+
+# Case 4: No installation method configured
+else
     zenity --error \
         --title="Virhe" \
         --text="Asennusohjelmaa ei ole määritelty eikä peliä ole asennettu.\n\nTarkista config.ini-tiedosto." \
@@ -166,27 +252,8 @@ if [ -z "$INSTALLER" ]; then
     exit 1
 fi
 
-if [ ! -f "$INSTALLER" ]; then
-    zenity --error \
-        --title="Virhe" \
-        --text="Asennusohjelmaa ei löydy:\n$INSTALLER\n\nPeliä ei ole asennettu." \
-        --width=400
-    exit 1
-fi
-
-# Show pre-installation instructions
-zenity --info \
-    --title="Pelin asennus" \
-    --text="Peli asennetaan nyt.\n\n<b>TÄRKEÄÄ:</b>\n• Käytä oletushakemistoa asennuksessa\n• ÄLÄ käynnistä peliä asennuksen jälkeen\n• Sulje asennusohjelma kun asennus on valmis" \
-    --width=500
-
-# Run installer
-echo "Running installer: $INSTALLER"
-if [ -n "$OUTPUT_WIDTH" ] && [ -n "$OUTPUT_HEIGHT" ]; then
-    wine explorer.exe /desktop=installer,"${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}" "$INSTALLER"
-else
-    wine "$INSTALLER"
-fi
+# Run the installer
+run_installer "$INSTALLER_PATH"
 
 # Verify installation
 if [ -n "$EXE" ] && [ -f "$EXE" ]; then
