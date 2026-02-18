@@ -4,6 +4,59 @@
 
 set -e
 
+# Handle --help argument
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    cat <<EOF
+Wine Game Entrypoint
+
+Usage: entrypoint.sh [OPTIONS]
+
+Options:
+  --help, -h    Show this help message
+  --reset       Remove Wine prefix and start fresh (runs backup first if available)
+
+Environment variables:
+  USE_GAMESCOPE     Enable/disable gamescope (0 or 1, default: from config or 1)
+  OUTPUT_WIDTH      Output resolution width (overrides config.ini)
+  OUTPUT_HEIGHT     Output resolution height (overrides config.ini)
+  FULLSCREEN        Enable fullscreen mode (0 or 1, default: from config or 0)
+  WINE_VERSION      Wine version to use (default: wine-10)
+  WINEARCH          Wine architecture (win32/win64/wow64)
+  WINEDEBUG         Wine debug flags
+
+Configuration:
+  Game settings are read from /app/config.ini
+
+  Config options:
+    exe=<path>              Path to game executable (required)
+    installer=<path>        Path to installer for first-run setup
+    windows_version=<ver>   Windows version (e.g., winxp, win7, win10)
+    output_width=<int>      Output resolution width
+    output_height=<int>     Output resolution height
+    use_gamescope=<0|1>     Enable gamescope (default: 1)
+    fullscreen=<0|1>        Enable fullscreen mode (default: 0)
+
+Extensions:
+  Extensions installed to /app/share/wine/extensions/ are automatically
+  symlinked to C:\\extensions\\ in the Wine prefix. For example, DxWnd
+  is available at C:\\extensions\\dxwnd\\ if the extension is enabled.
+
+Examples:
+  # Run with gamescope disabled
+  USE_GAMESCOPE=0 flatpak run <app-id>
+
+  # Run in fullscreen mode
+  FULLSCREEN=1 flatpak run <app-id>
+
+  # Reset Wine prefix (removes all game data, keeps saves if backup script exists)
+  flatpak run <app-id> --reset
+
+  # Debug Wine issues
+  flatpak run --env=WINEDEBUG=+all <app-id>
+EOF
+    exit 0
+fi
+
 # Handle --reset argument to remove Wine prefix and start fresh
 if [ "$1" = "--reset" ]; then
     shift
@@ -82,6 +135,15 @@ if [ -d "/app/extra/iso_contents" ]; then
         ln -sf "/app/extra/iso_contents" "$D_DRIVE"
         # Set D: as CD-ROM drive in registry
         wine reg add 'HKEY_LOCAL_MACHINE\Software\Wine\Drives' /v D: /t REG_SZ /d cdrom /f 2>/dev/null || true
+    fi
+fi
+
+# Symlink extensions directory to Wine prefix
+# Makes extensions available at C:\extensions\<name> in Wine
+if [ -d "/app/share/wine/extensions" ]; then
+    target="$WINEPREFIX/drive_c/extensions"
+    if [ ! -e "$target" ]; then
+        ln -sf "/app/share/wine/extensions" "$target"
     fi
 fi
 

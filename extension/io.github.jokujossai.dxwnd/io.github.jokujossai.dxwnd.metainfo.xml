@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="runtime">
+  <id>io.github.jokujossai.dxwnd</id>
+  <name>DxWnd</name>
+  <summary>DirectDraw/DirectX compatibility wrapper</summary>
+  <description>
+    <p>DxWnd is a Windows compatibility tool that intercepts DirectDraw and DirectX
+    calls to enable legacy games to run properly on modern systems.</p>
+  </description>
+  <project_license>GPL-3.0-or-later</project_license>
+  <url type="homepage">https://sourceforge.net/projects/dxwnd/</url>
+  <metadata_license>CC0-1.0</metadata_license>
+  <releases>
+    <release version="2.06.13" date="2024-12-01"/>
+  </releases>
+</component>

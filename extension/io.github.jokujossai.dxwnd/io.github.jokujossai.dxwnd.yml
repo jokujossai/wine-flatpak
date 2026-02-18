@@ -1,0 +1,24 @@
+id: io.github.jokujossai.dxwnd
+branch: stable
+runtime: io.github.jokujossai.wine.base
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk//25.08
+build-extension: true
+separate-locales: false
+appstream-compose: false
+
+modules:
+  - name: dxwnd
+    buildsystem: simple
+    build-commands:
+      - 7zz x dxwnd.rar -odxwnd-extracted
+      - mkdir -p ${FLATPAK_DEST}/
+      - cp -a dxwnd-extracted/* ${FLATPAK_DEST}/
+      - install -Dm644 io.github.jokujossai.dxwnd.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/
+    sources:
+      - type: file
+        url: https://sourceforge.net/projects/dxwnd/files/Latest%20build/v2_06_13_build.rar
+        sha256: 43db888e450afa00e7cfc87d1e50eef9e6eccf810698a04fd862c5ebf81d176e
+        dest-filename: dxwnd.rar
+      - type: file
+        path: io.github.jokujossai.dxwnd.metainfo.xml

@@ -79,8 +79,12 @@ if [ "${USE_GAMESCOPE:-1}" = "1" ]; then
     fi
 fi
 
-# Fallback: use wine virtual desktop if width/height provided, otherwise run directly
-if [ -n "$WIDTH" ] && [ -n "$HEIGHT" ]; then
+# Fallback: no gamescope available or disabled
+# If fullscreen, run directly (let game handle its own fullscreen)
+# Otherwise use virtual desktop if resolution specified
+if [ "${FULLSCREEN:-0}" = "1" ]; then
+    exec "$WINE_BIN" "$@"
+elif [ -n "$WIDTH" ] && [ -n "$HEIGHT" ]; then
     exec "$WINE_BIN" explorer.exe /desktop=wine-desktop,"${WIDTH}x${HEIGHT}" "$@"
 else
     exec "$WINE_BIN" "$@"
