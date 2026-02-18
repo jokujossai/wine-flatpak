@@ -4,7 +4,7 @@
 set -e
 
 BIN_NAME="$(basename "$0")"
-WINE_VERSION="${WINE_VERSION:-wine-10}"
+WINE_VERSION="${WINE_VERSION:-wine-10-wow64}"
 WINE_BIN="/app/wine/${WINE_VERSION}/bin"
 
 # Detect Wine build type
