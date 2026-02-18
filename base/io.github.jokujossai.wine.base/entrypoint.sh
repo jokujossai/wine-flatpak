@@ -43,6 +43,11 @@ Extensions:
   symlinked to C:\\extensions\\ in the Wine prefix. For example, DxWnd
   is available at C:\\extensions\\dxwnd\\ if the extension is enabled.
 
+Optional scripts (place in /app/bin/):
+  wine-backup.sh       Called before --reset removes Wine prefix
+  wine-restore.sh      Called after Wine prefix creation
+  wine-post-install.sh Called after game installation completes
+
 Examples:
   # Run with gamescope disabled
   USE_GAMESCOPE=0 flatpak run <app-id>
@@ -257,6 +262,12 @@ run_installer "$INSTALLER_PATH"
 
 # Verify installation
 if [ -n "$EXE" ] && [ -f "$EXE" ]; then
+    # Run optional post-install script
+    if [ -x "/app/bin/wine-post-install.sh" ]; then
+        echo "Running post-install script..."
+        /app/bin/wine-post-install.sh
+    fi
+
     zenity --info \
         --title="Asennus valmis" \
         --text="Peli asennettu onnistuneesti!\n\nPeli käynnistyy nyt." \
