@@ -13,7 +13,8 @@ sources:
     x-checker-data:
       type: json
       url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibei/releases
-      version-query: first | .tag_name
+      version-query: '[.[] | select(.name | test("rc|RC") | not)] | sort_by(.tag_name
+        | split(".") | map(tonumber)) | last | .tag_name'
       url-query: '"https://gitlab.freedesktop.org/libinput/libei/-/archive/" + $version + "/libei-" + $version + ".tar.gz"'
 modules:
   - name: python3-attrs
