@@ -17,6 +17,7 @@ Options:
 
 Environment variables:
   USE_GAMESCOPE     Enable/disable gamescope (0 or 1, default: from config or 1)
+  USE_DXWND         Enable/disable DxWnd (0 or 1, default: from config or 0)
   OUTPUT_WIDTH      Output resolution width (overrides config.ini)
   OUTPUT_HEIGHT     Output resolution height (overrides config.ini)
   FULLSCREEN        Enable fullscreen mode (0 or 1, default: from config or 0)
@@ -36,6 +37,7 @@ Configuration:
     output_width=<int>      Output resolution width
     output_height=<int>     Output resolution height
     use_gamescope=<0|1>     Enable gamescope (default: 1)
+    use_dxwnd=<0|1>         Enable DxWnd (default: 0, requires dxwnd.ini next to exe)
     fullscreen=<0|1>        Enable fullscreen mode (default: 0)
 
 Extensions:
@@ -99,15 +101,17 @@ INSTALLER_CDROM=$(grep -E "^installer_cdrom=" "$CONFIG_FILE" | cut -d'=' -f2- | 
 _CFG_OUTPUT_WIDTH=$(grep -E "^output_width=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
 _CFG_OUTPUT_HEIGHT=$(grep -E "^output_height=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
 _CFG_USE_GAMESCOPE=$(grep -E "^use_gamescope=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
+_CFG_USE_DXWND=$(grep -E "^use_dxwnd=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
 _CFG_FULLSCREEN=$(grep -E "^fullscreen=" "$CONFIG_FILE" | cut -d'=' -f2- | tr -d '\r')
 
 # Environment overrides config, then apply defaults
 OUTPUT_WIDTH="${OUTPUT_WIDTH:-$_CFG_OUTPUT_WIDTH}"
 OUTPUT_HEIGHT="${OUTPUT_HEIGHT:-$_CFG_OUTPUT_HEIGHT}"
 USE_GAMESCOPE="${USE_GAMESCOPE:-${_CFG_USE_GAMESCOPE:-1}}"
+USE_DXWND="${USE_DXWND:-${_CFG_USE_DXWND:-0}}"
 FULLSCREEN="${FULLSCREEN:-${_CFG_FULLSCREEN:-0}}"
 
-export OUTPUT_WIDTH OUTPUT_HEIGHT USE_GAMESCOPE FULLSCREEN
+export OUTPUT_WIDTH OUTPUT_HEIGHT USE_GAMESCOPE USE_DXWND FULLSCREEN
 
 # Initialize Wine prefix on first run
 if [ ! -d "$WINEPREFIX" ]; then

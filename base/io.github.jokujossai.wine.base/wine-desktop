@@ -58,6 +58,20 @@ elif [ -z "$WIDTH" ] && [ -n "$HEIGHT" ]; then
     exit 1
 fi
 
+# Check if DxWnd should be used (preferred over gamescope)
+if [ "${USE_DXWND:-0}" = "1" ]; then
+    DXWND_EXE="$WINEPREFIX/drive_c/extensions/dxwnd/dxwnd.exe"
+    GAME_EXE="$1"
+    GAME_DIR=$(dirname "$GAME_EXE")
+    DXWND_INI="$GAME_DIR/dxwnd.ini"
+
+    if [ -f "$DXWND_EXE" ] && [ -f "$DXWND_INI" ]; then
+        # Launch game via DxWnd from game directory (skips gamescope)
+        cd "$GAME_DIR"
+        exec "$WINE_BIN" "C:\\extensions\\dxwnd\\dxwnd.exe" /R:1
+    fi
+fi
+
 # Check if gamescope should be used (enabled by default, disable with USE_GAMESCOPE=0)
 if [ "${USE_GAMESCOPE:-1}" = "1" ]; then
     # Try to find gamescope (prefer jokujossai, fallback to vulkan)
