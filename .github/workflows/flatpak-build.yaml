@@ -214,39 +214,6 @@ jobs:
           echo "${GPG_PASSPHRASE}" | /usr/libexec/gpg-preset-passphrase --preset "${GPG_KEY_GREP}"
           echo "${GPG_PRIVATE_KEY}" | gpg --import --batch
 
-      - name: Restore repository
-        if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
-        run: |
-          set -e
-
-          BASE_URL="$(gh api /repos/${GITHUB_REPOSITORY}/pages --jq .html_url)" || true
-          if [ -z "$BASE_URL" ]; then
-            echo "Pages not configured yet"
-            exit 0
-          fi
-
-          curl -o/dev/null -sf "${BASE_URL}summary" || {
-            echo "Repository does not exist yet"
-            exit 0
-          }
-
-          ostree --repo=repo init --mode=archive
-          ostree --repo=repo remote add wine-flatpak "${BASE_URL%/}" --gpg-import=repo.gpg
-          ostree --repo=repo pull --mirror wine-flatpak --depth=-1 || true
-
-          flatpak build-update-repo \
-            --gpg-sign="${GPG_KEY_ID}" \
-            --generate-static-deltas \
-            --prune \
-            repo || true
-
-          curl -o repo/config -sf "${BASE_URL}config" || true
-          rm -rf repo/*.trustedkeys.gpg repo/extensions repo/state repo/tmp 2>/dev/null || true
-
       - name: Download all component repos
         uses: actions/download-artifact@v7
         with:
@@ -257,10 +224,8 @@ jobs:
         run: |
           set -e
 
-          # Initialize repo if not restored
-          if [ ! -d repo/objects ]; then
-            ostree --repo=repo init --mode=archive
-          fi
+          # Initialize repo
+          ostree --repo=repo init --mode=archive
 
           # Pull from each component repo
           for component_dir in components/*-repo; do
