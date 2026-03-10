@@ -65,6 +65,7 @@ jobs:
             --repo=repo \
             --disable-rofiles-fuse \
             --disable-updates \
+            --install-deps-from=flathub \
             --force-clean \
             --default-branch=25.08 \
             --arch=x86_64 \
@@ -223,6 +224,8 @@ jobs:
             --repo=repo \
             --disable-rofiles-fuse \
             --disable-updates \
+            --install-deps-from=flathub \
+            --install-deps-from=base-repo \
             --force-clean \
             --default-branch="${BRANCH}" \
             --arch=x86_64 \
