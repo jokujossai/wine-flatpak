@@ -51,7 +51,7 @@ jobs:
         id: build-base
         env:
           GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
-          BUNDLE: ${{ github.ref_type == 'tag' && 'io.github.jokujossai.wine.base' || '' }}
+          BUNDLE: io.github.jokujossai.wine.base
         run: |
           set -e
           xvfb-run --auto-servernum flatpak-builder \
@@ -198,7 +198,7 @@ jobs:
         id: build
         env:
           GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
-          BUNDLE: ${{ github.ref_type == 'tag' && matrix.id || '' }}
+          BUNDLE: ${{ matrix.id }}
           BRANCH: ${{ matrix.branch }}
           MANIFEST: ${{ matrix.manifest }}
         run: |
