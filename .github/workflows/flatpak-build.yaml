@@ -47,16 +47,48 @@ jobs:
           restore-keys: |
             flatpak-base-
 
+      - name: Download sources
+        run: |
+          flatpak-builder \
+            --download-only \
+            flatpak_app \
+            base/io.github.jokujossai.wine.base/io.github.jokujossai.wine.base.yml
+
       - name: Build Base Runtime
         id: build-base
-        uses: flatpak/flatpak-github-actions/flatpak-builder@master
+        env:
+          GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
+          BUNDLE: io.github.jokujossai.wine.base
+        run: |
+          set -e
+          xvfb-run --auto-servernum flatpak-builder \
+            --repo=repo \
+            --disable-rofiles-fuse \
+            --disable-updates \
+            --install-deps-from=flathub \
+            --force-clean \
+            --default-branch=25.08 \
+            --arch=x86_64 \
+            --ccache \
+            --gpg-sign="${GPG_KEY_ID}" \
+            flatpak_app \
+            base/io.github.jokujossai.wine.base/io.github.jokujossai.wine.base.yml
+
+          if [ -n "$BUNDLE" ]; then
+            flatpak build-bundle repo "${BUNDLE}.flatpak" \
+              --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo \
+              --arch=x86_64 \
+              "${BUNDLE}" \
+              "25.08"
+          fi
+
+      - name: Upload base bundle
+        if: hashFiles('*.flatpak') != ''
+        uses: actions/upload-artifact@v6
         with:
-          bundle: io.github.jokujossai.wine.base.flatpak
-          manifest-path: base/io.github.jokujossai.wine.base/io.github.jokujossai.wine.base.yml
-          branch: '25.08'
-          gpg-sign: ${{ vars.GPG_KEY_ID }}
-          build-bundle: ${{ github.ref_type == 'tag' }}
-          cache: false
+          name: base-bundle
+          path: "*.flatpak"
+          retention-days: 1
 
       - name: Upload base repo
         uses: actions/upload-artifact@v6
@@ -170,17 +202,53 @@ jobs:
           restore-keys: |
             flatpak-${{ matrix.name }}-
 
+      - name: Download sources
+        env:
+          MANIFEST: ${{ matrix.manifest }}
+        run: |
+          flatpak-builder \
+            --download-only \
+            flatpak_app \
+            "${MANIFEST}"
+
       - name: Build ${{ matrix.name }}
         id: build
-        uses: flatpak/flatpak-github-actions/flatpak-builder@master
+        env:
+          GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
+          BUNDLE: ${{ matrix.id }}
+          BRANCH: ${{ matrix.branch }}
+          MANIFEST: ${{ matrix.manifest }}
+        run: |
+          set -e
+          xvfb-run --auto-servernum flatpak-builder \
+            --repo=repo \
+            --disable-rofiles-fuse \
+            --disable-updates \
+            --install-deps-from=flathub \
+            --install-deps-from=base-repo \
+            --force-clean \
+            --default-branch="${BRANCH}" \
+            --arch=x86_64 \
+            --ccache \
+            --gpg-sign="${GPG_KEY_ID}" \
+            flatpak_app \
+            "${MANIFEST}"
+
+          if [ -n "$BUNDLE" ]; then
+            flatpak build-bundle repo "${BUNDLE}.flatpak" \
+              --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo \
+              --arch=x86_64 \
+              "${BUNDLE}" \
+              "${BRANCH}"
+          fi
+
+      - name: Upload component bundle
+        if: hashFiles('*.flatpak') != ''
+        uses: actions/upload-artifact@v6
         with:
-          bundle: ${{ matrix.id }}.flatpak
-          manifest-path: ${{ matrix.manifest }}
-          branch: ${{ matrix.branch }}
-          gpg-sign: ${{ vars.GPG_KEY_ID }}
-          build-bundle: ${{ github.ref_type == 'tag' }}
-          repository-name: base-repo
-          cache: false
+          name: ${{ matrix.name }}-bundle
+          path: "*.flatpak"
+          retention-days: 1
 
       - name: Upload component repo
         uses: actions/upload-artifact@v6
@@ -338,11 +406,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download flatpak artifacts
+      - name: Download flatpak bundles
         if: github.ref_type == 'tag'
         uses: actions/download-artifact@v7
         with:
-          pattern: "*.flatpak"
+          pattern: "*-bundle"
           merge-multiple: true
 
       - name: Create release
