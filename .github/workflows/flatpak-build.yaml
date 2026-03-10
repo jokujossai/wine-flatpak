@@ -74,6 +74,14 @@ jobs:
               "25.08"
           fi
 
+      - name: Upload base bundle
+        if: hashFiles('*.flatpak') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: base-bundle
+          path: "*.flatpak"
+          retention-days: 1
+
       - name: Upload base repo
         uses: actions/upload-artifact@v6
         with:
@@ -214,6 +222,14 @@ jobs:
               "${BUNDLE}" \
               "${BRANCH}"
           fi
+
+      - name: Upload component bundle
+        if: hashFiles('*.flatpak') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.name }}-bundle
+          path: "*.flatpak"
+          retention-days: 1
 
       - name: Upload component repo
         uses: actions/upload-artifact@v6
@@ -371,11 +387,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download flatpak artifacts
+      - name: Download flatpak bundles
         if: github.ref_type == 'tag'
         uses: actions/download-artifact@v7
         with:
-          pattern: "*.flatpak"
+          pattern: "*-bundle"
           merge-multiple: true
 
       - name: Create release
