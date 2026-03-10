@@ -47,6 +47,13 @@ jobs:
           restore-keys: |
             flatpak-base-
 
+      - name: Download sources
+        run: |
+          flatpak-builder \
+            --download-only \
+            flatpak_app \
+            base/io.github.jokujossai.wine.base/io.github.jokujossai.wine.base.yml
+
       - name: Build Base Runtime
         id: build-base
         env:
@@ -193,6 +200,15 @@ jobs:
           key: flatpak-${{ matrix.name }}-${{ hashFiles(matrix.manifest) }}
           restore-keys: |
             flatpak-${{ matrix.name }}-
+
+      - name: Download sources
+        env:
+          MANIFEST: ${{ matrix.manifest }}
+        run: |
+          flatpak-builder \
+            --download-only \
+            flatpak_app \
+            "${MANIFEST}"
 
       - name: Build ${{ matrix.name }}
         id: build
