@@ -93,6 +93,7 @@ output_height=600
 
 # Optional: Enable/disable features
 use_gamescope=1
+use_dxwnd=0
 fullscreen=0
 ```
 
@@ -220,6 +221,7 @@ inherit-extensions:
   - org.freedesktop.Platform.GL32
   - io.github.jokujossai.wine.support
   - io.github.jokujossai.gamescope
+  - io.github.jokujossai.dxwnd
   - io.github.jokujossai.wine.Version
 
 finish-args:
@@ -260,6 +262,7 @@ modules:
 
 ### Game Runtime
 - `USE_GAMESCOPE` - Enable/disable gamescope (default: from config.ini or 1)
+- `USE_DXWND` - Enable/disable DxWnd (default: from config.ini or 0)
 - `OUTPUT_WIDTH` / `OUTPUT_HEIGHT` - Override gamescope resolution
 - `FULLSCREEN` - Force fullscreen mode
 - `WINE_VERSION` - Select Wine version (default: wine-10)
