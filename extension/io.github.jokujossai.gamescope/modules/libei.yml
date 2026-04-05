@@ -15,7 +15,8 @@ sources:
       url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibei/releases
       version-query: '[.[] | select(.name | test("rc|RC") | not)] | sort_by(.tag_name
         | split(".") | map(tonumber)) | last | .tag_name'
-      url-query: '"https://gitlab.freedesktop.org/libinput/libei/-/archive/" + $version + "/libei-" + $version + ".tar.gz"'
+      url-query: '"https://gitlab.freedesktop.org/libinput/libei/-/archive/" + $version
+        + "/libei-" + $version + ".tar.gz"'
 modules:
   - name: python3-attrs
     buildsystem: simple
@@ -24,8 +25,8 @@ modules:
         --prefix=${FLATPAK_DEST} --no-build-isolation attrs
     sources:
       - type: file
-        url: https://files.pythonhosted.org/packages/3a/2a/7cc015f5b9f5db42b7d48157e23356022889fc354a2813c15934b7cb5c0e/attrs-25.4.0-py3-none-any.whl
-        sha256: adcf7e2a1fb3b36ac48d97835bb6d8ade15b8dcce26aba8bf1d14847b57a3373
+        url: https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl
+        sha256: c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309
         x-checker-data:
           type: pypi
           name: attrs
