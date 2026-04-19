@@ -283,8 +283,8 @@ modules:
       - --without-dmapi
     sources: &samba-sources
       - type: archive
-        url: https://samba.org/samba/ftp/stable/samba-4.23.6.tar.gz
-        sha256: e3dabd8b5e42dc97669fa0faef032510a94e496b58f7067082e5036d88f0e702
+        url: https://samba.org/samba/ftp/stable/samba-4.24.1.tar.gz
+        sha256: 217151ca318a5576f8e0de72ba0acdf08157ecf12adac42d1af86db0b09a5f5a
         x-checker-data:
           type: html
           url: https://samba.org/samba/ftp/stable/
