@@ -8,8 +8,8 @@ make-install-args:
 sources:
   - type: git
     url: https://github.com/openresty/luajit2.git
-    tag: v2.1-20260227
-    commit: 928290a470d35eb01324d5275b22fb86b13602a2
+    tag: v2.1-20260620
+    commit: b411bec3ce550ef9968fc83bca094455cf812c1f
     x-checker-data:
       type: git
       tag-pattern: ^v([\d.-]+)$
