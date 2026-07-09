@@ -30,12 +30,12 @@ modules:
           tag-pattern: ^([\d.]+)$
 
   - name: cabextract
+    subdir: cabextract
     sources:
-      - type: archive
-        url: https://www.cabextract.org.uk/cabextract-1.11.tar.gz
-        sha256: b5546db1155e4c718ff3d4b278573604f30dd64c3c5bfd4657cd089b823a3ac6
+      - type: git
+        url: https://github.com/kyz/libmspack.git
+        tag: v1.11
+        commit: 305907723a4e7ab2018e58040059ffb5e77db837
         x-checker-data:
-          type: anitya
-          project-id: 245
-          stable-only: true
-          url-template: https://www.cabextract.org.uk/cabextract-$version.tar.gz
+          type: git
+          tag-pattern: ^v([\d.]+)$
