@@ -30,12 +30,92 @@ modules:
           tag-pattern: ^([\d.]+)$
 
   - name: cabextract
+    # Built from the libmspack git checkout, which - unlike the cabextract.org.uk
+    # release tarball - ships no pre-generated configure and must be bootstrapped
+    # with autoreconf. cabextract's configure.ac calls AM_ICONV, a macro that
+    # modern gettext no longer installs onto aclocal's search path (iconv() itself
+    # lives in glibc, so no separate library is needed). Append a self-contained
+    # AM_ICONV to acinclude.m4 - which aclocal scans automatically - so autoreconf
+    # can expand it, then build by hand.
+    buildsystem: simple
+    subdir: cabextract
+    build-commands:
+      - cat ../cabextract-am-iconv.m4 >> acinclude.m4
+      - autoreconf -fi
+      - ./configure --prefix=${FLATPAK_DEST}
+      - make -j $FLATPAK_BUILDER_N_JOBS
+      - make install
     sources:
-      - type: archive
-        url: https://www.cabextract.org.uk/cabextract-1.11.tar.gz
-        sha256: b5546db1155e4c718ff3d4b278573604f30dd64c3c5bfd4657cd089b823a3ac6
+      - type: git
+        url: https://github.com/kyz/libmspack.git
+        tag: v1.11
+        commit: 305907723a4e7ab2018e58040059ffb5e77db837
         x-checker-data:
-          type: anitya
-          project-id: 245
-          stable-only: true
-          url-template: https://www.cabextract.org.uk/cabextract-$version.tar.gz
+          type: git
+          tag-pattern: ^v([\d.]+)$
+      - type: inline
+        dest-filename: cabextract-am-iconv.m4
+        contents: |
+          # Self-contained AM_ICONV, appended to cabextract's acinclude.m4 so autoreconf
+          # can bootstrap the git checkout. Modern gettext no longer installs the classic
+          # AM_ICONV macro onto aclocal's search path; on glibc, iconv() lives in libc.
+          AC_DEFUN([AM_ICONV],
+          [
+            AC_CHECK_HEADERS([iconv.h])
+            am_func_iconv=no
+            am_lib_iconv=no
+            AC_MSG_CHECKING([for iconv])
+            AC_LINK_IFELSE(
+              [AC_LANG_PROGRAM(
+                [[#include <stdlib.h>
+          #include <iconv.h>]],
+                [[iconv_t cd = iconv_open("", "");
+                  iconv(cd, NULL, NULL, NULL, NULL);
+                  iconv_close(cd);]])],
+              [am_func_iconv=yes])
+            if test "$am_func_iconv" != yes; then
+              am_save_LIBS="$LIBS"
+              LIBS="$LIBS -liconv"
+              AC_LINK_IFELSE(
+                [AC_LANG_PROGRAM(
+                  [[#include <stdlib.h>
+          #include <iconv.h>]],
+                  [[iconv_t cd = iconv_open("", "");
+                    iconv(cd, NULL, NULL, NULL, NULL);
+                    iconv_close(cd);]])],
+                [am_func_iconv=yes; am_lib_iconv=yes])
+              LIBS="$am_save_LIBS"
+            fi
+            AC_MSG_RESULT([$am_func_iconv])
+            LIBICONV=
+            LTLIBICONV=
+            if test "$am_func_iconv" = yes; then
+              AC_DEFINE([HAVE_ICONV], [1], [Define if you have the iconv() function.])
+              if test "$am_lib_iconv" = yes; then
+                LIBICONV="-liconv"
+                LTLIBICONV="-liconv"
+              fi
+            fi
+            AC_SUBST([LIBICONV])
+            AC_SUBST([LTLIBICONV])
+            AC_MSG_CHECKING([whether iconv() takes a const second argument])
+            AC_COMPILE_IFELSE(
+              [AC_LANG_PROGRAM(
+                [[#include <stdlib.h>
+          #include <iconv.h>
+          extern
+          #ifdef __cplusplus
+          "C"
+          #endif
+          size_t iconv (iconv_t cd, char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft);
+          ]],
+                [[]])],
+              [am_iconv_const=no],
+              [am_iconv_const=yes])
+            AC_MSG_RESULT([$am_iconv_const])
+            if test "$am_iconv_const" = yes; then
+              AC_DEFINE([ICONV_CONST], [const], [Define as const if the declaration of iconv() needs const.])
+            else
+              AC_DEFINE([ICONV_CONST], [], [Define as const if the declaration of iconv() needs const.])
+            fi
+          ])
