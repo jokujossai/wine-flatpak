@@ -23,8 +23,8 @@ modules:
     sources:
       - type: archive
         # renovate: datasource=github-releases depName=vcrhonek/hwdata versioning=loose extractVersion=^v(?<version>.+)$ shape=double
-        url: https://github.com/vcrhonek/hwdata/archive/v0.405/hwdata-0.405.tar.gz
-        sha256: 13605519e72e46aa13d5eede1901a07a6c83cd25ef866a86e7458047b5c81ce5
+        url: https://github.com/vcrhonek/hwdata/archive/v0.409/hwdata-0.409.tar.gz
+        sha256: 23006accc0f931dd5187d0307a57d0744e2b8feb85e73c37bc0f5229fb31eadd
     post-install:
       - mkdir -p -m 755 ${FLATPAK_DEST}/lib/pkgconfig
       - install -m 644 ${FLATPAK_DEST}/share/pkgconfig/hwdata.pc ${FLATPAK_DEST}/lib/pkgconfig/
