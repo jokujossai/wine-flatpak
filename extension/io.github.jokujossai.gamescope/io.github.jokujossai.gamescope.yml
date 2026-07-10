@@ -22,14 +22,9 @@ modules:
       - --datarootdir=${FLATPAK_DEST}/share
     sources:
       - type: archive
+        # renovate: datasource=github-releases depName=vcrhonek/hwdata versioning=loose extractVersion=^v(?<version>.+)$ shape=double
         url: https://github.com/vcrhonek/hwdata/archive/v0.405/hwdata-0.405.tar.gz
         sha256: 13605519e72e46aa13d5eede1901a07a6c83cd25ef866a86e7458047b5c81ce5
-        x-checker-data:
-          type: json
-          url: https://api.github.com/repos/vcrhonek/hwdata/releases/latest
-          version-query: .tag_name | sub("^v"; "")
-          url-query: '"https://github.com/vcrhonek/hwdata/archive/v" + $version +
-            "/hwdata-" + $version + ".tar.gz"'
     post-install:
       - mkdir -p -m 755 ${FLATPAK_DEST}/lib/pkgconfig
       - install -m 644 ${FLATPAK_DEST}/share/pkgconfig/hwdata.pc ${FLATPAK_DEST}/lib/pkgconfig/
@@ -53,12 +48,10 @@ modules:
       - -Dforce_fallback_for=stb,wlroots,libliftoff,vkroots
     sources:
       - type: git
+        # renovate: datasource=github-tags depName=ValveSoftware/gamescope versioning=loose extractVersion=^(?<version>[\d.]+)$
         url: https://github.com/ValveSoftware/gamescope.git
         commit: 0b445d97dbfea5cd89e644b44627b907ffd1ac35
         tag: 3.16.20
-        x-checker-data:
-          type: git
-          tag-pattern: ^([\d.]+)$
 
       - type: patch
         path: fix-process-cleanup.patch
@@ -99,13 +92,9 @@ modules:
       - name: xmu
         sources:
           - type: archive
+            # renovate: datasource=custom.html depName=libXmu packageName=https://www.x.org/archive/individual/lib/ versioning=loose extractVersion=^libXmu-(?<version>[\d.]+)\.tar\.xz$
             url: https://www.x.org/archive/individual/lib/libXmu-1.3.1.tar.xz
             sha256: 81a99e94c4501e81c427cbaa4a11748b584933e94b7a156830c3621256857bc4
-            x-checker-data:
-              type: html
-              url: https://www.x.org/archive/individual/lib/
-              version-pattern: libXmu-([\d.]+)\.tar\.xz
-              url-template: https://www.x.org/archive/individual/lib/libXmu-$version.tar.xz
         cleanup:
           - /include
           - /lib/*.la
@@ -121,14 +110,9 @@ modules:
           - -DCMAKE_CXX_FLAGS=
         sources:
           - type: archive
+            # renovate: datasource=github-releases depName=google/benchmark versioning=loose extractVersion=^v(?<version>.+)$ shape=double
             url: https://github.com/google/benchmark/archive/v1.9.5/benchmark-1.9.5.tar.gz
             sha256: 9631341c82bac4a288bef951f8b26b41f69021794184ece969f8473977eaa340
-            x-checker-data:
-              type: json
-              url: https://api.github.com/repos/google/benchmark/releases/latest
-              version-query: .tag_name | sub("^v"; "")
-              url-query: '"https://github.com/google/benchmark/archive/v" + $version
-                + "/benchmark-" + $version + ".tar.gz"'
         cleanup:
           - /include
           - /lib/*.a

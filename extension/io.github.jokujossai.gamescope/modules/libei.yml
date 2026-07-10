@@ -8,14 +8,9 @@ config-opts:
   - -Dliboeffis=disabled
 sources:
   - type: archive
+    # renovate: datasource=gitlab-tags depName=libei packageName=libinput/libei versioning=loose extractVersion=^(?<version>\d+\.\d+\.\d+)$ registryUrl=https://gitlab.freedesktop.org shape=double
     url: https://gitlab.freedesktop.org/libinput/libei/-/archive/1.5.0/libei-1.5.0.tar.gz
     sha256: 7687c3bbcff89ff331c5db72e0a5cce6bcae382e3c238d6f7019a6bc71d88e43
-    x-checker-data:
-      type: json
-      url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibei/releases
-      version-query: '[.[] | select(.name | test("rc|RC") | not)] | sort_by(.tag_name
-        | split(".") | map(tonumber)) | last | .tag_name'
-      url-query: '"https://gitlab.freedesktop.org/libinput/libei/-/archive/" + $version + "/libei-" + $version + ".tar.gz"'
 modules:
   - name: python3-attrs
     buildsystem: simple
@@ -24,12 +19,9 @@ modules:
         --prefix=${FLATPAK_DEST} --no-build-isolation attrs
     sources:
       - type: file
+        # renovate: datasource=pypi depName=attrs
         url: https://files.pythonhosted.org/packages/3a/2a/7cc015f5b9f5db42b7d48157e23356022889fc354a2813c15934b7cb5c0e/attrs-25.4.0-py3-none-any.whl
         sha256: adcf7e2a1fb3b36ac48d97835bb6d8ade15b8dcce26aba8bf1d14847b57a3373
-        x-checker-data:
-          type: pypi
-          name: attrs
-          packagetype: bdist_wheel
     cleanup:
       - /lib/python*
   - name: python3-Jinja2
@@ -39,19 +31,13 @@ modules:
         --prefix=${FLATPAK_DEST} --no-build-isolation Jinja2
     sources:
       - type: file
+        # renovate: datasource=pypi depName=Jinja2
         url: https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl
         sha256: 85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67
-        x-checker-data:
-          type: pypi
-          name: Jinja2
-          packagetype: bdist_wheel
       - type: file
+        # renovate: datasource=pypi depName=MarkupSafe
         url: https://files.pythonhosted.org/packages/7e/99/7690b6d4034fffd95959cbe0c02de8deb3098cc577c67bb6a24fe5d7caa7/markupsafe-3.0.3.tar.gz
         sha256: 722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698
-        x-checker-data:
-          type: pypi
-          name: MarkupSafe
-          packagetype: sdist
     cleanup:
       - /lib/python*
 cleanup:

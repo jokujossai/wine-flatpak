@@ -308,9 +308,29 @@ Each game has isolated Wine prefix:
 - Manual workflow dispatch
 
 ### What It Does
-1. Builds all components in order: base → wine → gamescope → gecko → mono
-2. Creates a Flatpak repository
-3. On tags: deploys to GitHub Pages as a Flatpak repo
+1. On Renovate PRs: recomputes sha256/commit values and amends them into
+   Renovate's commit (`post-renovate` job + `scripts/renovate-fix-sources.py`)
+2. Builds all components in order: base → wine → gamescope → gecko → mono
+3. Creates a Flatpak repository
+4. On tags: deploys to GitHub Pages as a Flatpak repo
+
+### Dependency Updates (Renovate)
+
+Manifest sources are updated by Renovate via regex custom managers
+(`renovate.json`). Each updatable source carries a comment directly above its
+`url:` line:
+
+```yaml
+# renovate: datasource=<ds> depName=<name> [packageName=<pkg>] [versioning=<v>] [extractVersion=<re>] [registryUrl=<url>] [shape=double|truncated-dir]
+```
+
+- Attribute order is fixed (the managers match it literally)
+- `shape=double` marks URLs where the version occurs twice (directory + file
+  name); `shape=truncated-dir` is krb5's major.minor directory
+- `datasource=custom.html` treats `packageName` as an HTML index page URL;
+  `extractVersion` picks versions out of the listed links
+- Renovate only bumps versions in `url:`/`tag:` lines; the `post-renovate`
+  CI job fixes `sha256:`, `commit:` and PyPI URL hashes afterwards
 
 ### GitHub Repository Setup Required
 1. Go to Settings → Pages

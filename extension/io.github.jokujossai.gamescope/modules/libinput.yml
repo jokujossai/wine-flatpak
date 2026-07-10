@@ -9,15 +9,9 @@ config-opts:
   - -Dzshcompletiondir=no
 sources:
   - type: archive
+    # renovate: datasource=gitlab-tags depName=libinput packageName=libinput/libinput versioning=loose extractVersion=^(?<version>\d+\.\d+\.\d+)$ registryUrl=https://gitlab.freedesktop.org shape=double
     url: https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.31.0/libinput-1.31.0.tar.gz
     sha256: 5f95a8ce039b3b2b4560a60bbdb920518d41baa9419344e5878c94bd841d5a54
-    x-checker-data:
-      type: json
-      url: https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibinput/releases
-      version-query: '[.[] | select(.name | test("rc") | not)] | sort_by(.tag_name
-        | split(".") | map(tonumber)) | last | .tag_name'
-      url-query: '"https://gitlab.freedesktop.org/libinput/libinput/-/archive/" +
-        $version + "/libinput-" + $version + ".tar.gz"'
 cleanup:
   - /bin
   - /etc
@@ -33,13 +27,9 @@ modules:
       - --disable-static
     sources:
       - type: archive
+        # renovate: datasource=custom.html depName=mtdev packageName=https://bitmath.se/org/code/mtdev/ versioning=loose extractVersion=^mtdev-(?<version>[\d.]+)\.tar\.bz2$
         url: https://bitmath.se/org/code/mtdev/mtdev-1.1.7.tar.bz2
         sha256: a107adad2101fecac54ac7f9f0e0a0dd155d954193da55c2340c97f2ff1d814e
-        x-checker-data:
-          type: html
-          url: https://bitmath.se/org/code/mtdev/
-          version-pattern: mtdev-([\d.]+)\.tar\.bz2
-          url-template: https://bitmath.se/org/code/mtdev/mtdev-$version.tar.bz2
       # Upstream uses an outdated version of the config.guess/config.sub script,
       # so we override it here to fix aarch64 builds.
       - type: shell

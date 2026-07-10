@@ -5,13 +5,9 @@ config-opts:
   - -Ddocumentation=disabled
 sources:
   - type: archive
+    # renovate: datasource=custom.html depName=libevdev packageName=https://www.freedesktop.org/software/libevdev/ versioning=loose extractVersion=^libevdev-(?<version>[\d.]+)\.tar\.xz$
     url: https://www.freedesktop.org/software/libevdev/libevdev-1.13.6.tar.xz
     sha256: 73f215eccbd8233f414737ac06bca2687e67c44b97d2d7576091aa9718551110
-    x-checker-data:
-      type: html
-      url: https://www.freedesktop.org/software/libevdev/
-      version-pattern: libevdev-([\d.]+)\.tar\.xz
-      url-template: https://www.freedesktop.org/software/libevdev/libevdev-$version.tar.xz
 cleanup:
   - /bin
   - /include

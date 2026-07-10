@@ -14,7 +14,54 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Renovate only bumps versions in url:/tag: lines (see renovate.json).
+  # This job recomputes sha256 checksums, resolves git tags to commits and
+  # fixes PyPI URLs, then amends the fixes into Renovate's commit. The
+  # force-push (made with the app token) retriggers this workflow, and that
+  # second run - no longer authored by renovate[bot] - performs the build.
+  post-renovate:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.actor == 'renovate[bot]'
+    outputs:
+      changes_detected: ${{ steps.commit.outputs.changes_detected }}
+    steps:
+      - name: Generate app token
+        uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.head_ref }}
+          fetch-depth: 2
+
+      - name: Fix source checksums and commit hashes
+        run: python3 scripts/renovate-fix-sources.py
+
+      - name: Get last commit info
+        id: last-commit
+        run: |
+          echo "message=$(git log -1 --pretty=%s)" >> "$GITHUB_OUTPUT"
+          echo "author=$(git log -1 --pretty='%an <%ae>')" >> "$GITHUB_OUTPUT"
+
+      - name: Amend Renovate commit
+        id: commit
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_author: ${{ steps.last-commit.outputs.author }}
+          commit_message: ${{ steps.last-commit.outputs.message }}
+          commit_options: '--amend --no-edit'
+          push_options: '--force'
+
   build-base:
+    needs: post-renovate
+    if: >-
+      always() && !cancelled() &&
+      (needs.post-renovate.result == 'skipped' || needs.post-renovate.outputs.changes_detected == 'false')
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
@@ -67,6 +114,11 @@ jobs:
 
   build-components:
     needs: build-base
+    # Explicit guard: the default success() condition also considers
+    # transitive ancestors, so a skipped post-renovate would skip this job.
+    if: >-
+      always() && !cancelled() &&
+      needs.build-base.result == 'success'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
@@ -191,6 +243,9 @@ jobs:
 
   assemble-repo:
     needs: build-components
+    if: >-
+      always() && !cancelled() &&
+      needs.build-components.result == 'success'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
@@ -327,7 +382,10 @@ jobs:
             }
 
   deploy:
-    if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+    if: >-
+      always() && !cancelled() &&
+      needs.assemble-repo.result == 'success' &&
+      (github.ref == 'refs/heads/main' || github.ref_type == 'tag')
     runs-on: ubuntu-latest
     needs: assemble-repo
     permissions:
