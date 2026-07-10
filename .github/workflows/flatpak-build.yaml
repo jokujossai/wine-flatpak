@@ -114,6 +114,11 @@ jobs:
 
   build-components:
     needs: build-base
+    # Explicit guard: the default success() condition also considers
+    # transitive ancestors, so a skipped post-renovate would skip this job.
+    if: >-
+      always() && !cancelled() &&
+      needs.build-base.result == 'success'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
@@ -238,6 +243,9 @@ jobs:
 
   assemble-repo:
     needs: build-components
+    if: >-
+      always() && !cancelled() &&
+      needs.build-components.result == 'success'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
@@ -374,7 +382,10 @@ jobs:
             }
 
   deploy:
-    if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+    if: >-
+      always() && !cancelled() &&
+      needs.assemble-repo.result == 'success' &&
+      (github.ref == 'refs/heads/main' || github.ref_type == 'tag')
     runs-on: ubuntu-latest
     needs: assemble-repo
     permissions:
