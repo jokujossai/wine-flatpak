@@ -18,13 +18,7 @@ modules:
       - cp -a wine-mono-* ${FLATPAK_DEST}/mono/
     sources:
       - type: archive
+        # renovate: datasource=custom.html depName=wine-mono-8.1 packageName=https://dl.winehq.org/wine/wine-mono/ versioning=loose extractVersion=^(?<version>8\.1\.\d+)/$ shape=double
         url: https://dl.winehq.org/wine/wine-mono/8.1.0/wine-mono-8.1.0-x86.tar.xz
         strip-components: 0
         sha256: 4e3e8a40729e4c9e3e9e651cebe4f1aed8f9a4d22e991e6cd24608687f0eedd4
-        x-checker-data:
-          type: html
-          url: https://dl.winehq.org/wine/wine-mono/
-          versions:
-            "<": "8.2.0"
-          version-pattern: href="(8\.1\.\d+)/"
-          url-template: https://dl.winehq.org/wine/wine-mono/$version/wine-mono-$version-x86.tar.xz

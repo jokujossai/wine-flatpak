@@ -4,12 +4,10 @@ make-install-args:
   - PREFIX=${FLATPAK_DEST}
 sources:
   - type: git
+    # renovate: datasource=github-tags depName=Winetricks/winetricks versioning=loose extractVersion=^(?<version>\d+)$
     url: https://github.com/Winetricks/winetricks.git
     tag: '20260125'
     commit: b76e1ee79ac57d7aceb384f74518fc423265810c
-    x-checker-data:
-      type: git
-      tag-pattern: ^(\d+)$
 modules:
 
   - name: 7zip
@@ -22,12 +20,10 @@ modules:
       - ln -s ${FLATPAK_DEST}/bin/7zz ${FLATPAK_DEST}/bin/7z
     sources:
       - type: git
+        # renovate: datasource=github-tags depName=ip7z/7zip versioning=loose extractVersion=^(?<version>[\d.]+)$
         url: https://github.com/ip7z/7zip.git
         tag: '26.00'
         commit: 839151eaaad24771892afaae6bac690e31e58384
-        x-checker-data:
-          type: git
-          tag-pattern: ^([\d.]+)$
 
   - name: cabextract
     # Built from the libmspack git checkout, which - unlike the cabextract.org.uk
@@ -47,12 +43,10 @@ modules:
       - make install
     sources:
       - type: git
+        # renovate: datasource=github-tags depName=kyz/libmspack versioning=loose extractVersion=^v(?<version>[\d.]+)$
         url: https://github.com/kyz/libmspack.git
         tag: v1.11
         commit: 305907723a4e7ab2018e58040059ffb5e77db837
-        x-checker-data:
-          type: git
-          tag-pattern: ^v([\d.]+)$
       - type: inline
         dest-filename: cabextract-am-iconv.m4
         contents: |

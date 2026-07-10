@@ -159,13 +159,9 @@ modules:
       - --disable-rpath
     sources: &krb5-sources
       - type: archive
+        # renovate: datasource=github-tags depName=krb5 packageName=krb5/krb5 versioning=loose extractVersion=^krb5-(?<version>[\d.]+)-final$ shape=truncated-dir
         url: https://kerberos.org/dist/krb5/1.22/krb5-1.22.2.tar.gz
         sha256: 3243ffbc8ea4d4ac22ddc7dd2a1dc54c57874c40648b60ff97009763554eaf13
-        x-checker-data:
-          type: anitya
-          project-id: 13287
-          stable-only: true
-          url-template: https://kerberos.org/dist/krb5/${version0}.${version1}/krb5-${version0}.${version1}.${version2}.tar.gz
 
   - name: krb5-32bit
     subdir: src
@@ -189,13 +185,9 @@ modules:
   - name: unixodbc
     sources: &unixodbc-sources
       - type: archive
+        # renovate: datasource=github-tags depName=unixodbc packageName=lurcher/unixODBC versioning=loose extractVersion=^v?(?<version>\d+\.\d+\.\d+)$
         url: https://www.unixodbc.org/unixODBC-2.3.14.tar.gz
         sha256: 4e2814de3e01fc30b0b9f75e83bb5aba91ab0384ee951286504bb70205524771
-        x-checker-data:
-          type: anitya
-          project-id: 7344
-          stable-only: true
-          url-template: https://www.unixodbc.org/unixODBC-$version.tar.gz
 
   - name: unixodbc-32bit
     build-options:
@@ -211,14 +203,9 @@ modules:
       - cp -a CL $FLATPAK_DEST/include/
     sources:
       - type: archive
+        # renovate: datasource=github-releases depName=KhronosGroup/OpenCL-Headers versioning=loose extractVersion=^v(?<version>.+)$
         url: https://github.com/KhronosGroup/OpenCL-Headers/archive/refs/tags/v2025.07.22.tar.gz
         sha256: 98f0a3ea26b4aec051e533cb1750db2998ab8e82eda97269ed6efe66ec94a240
-        x-checker-data:
-          type: json
-          url: https://api.github.com/repos/KhronosGroup/OpenCL-Headers/releases/latest
-          version-query: .tag_name | sub("^v"; "")
-          url-query: '"https://github.com/KhronosGroup/OpenCL-Headers/archive/refs/tags/v"
-            + $version + ".tar.gz"'
 
   # Samba + dependencies - For ntlm_auth and other functionalities in Wine
 
@@ -232,27 +219,18 @@ modules:
       - '*'
     sources:
       - type: archive
+        # renovate: datasource=cpan depName=parse-yapp packageName=Parse::Yapp
         url: https://cpan.metacpan.org/authors/id/W/WB/WBRASWELL/Parse-Yapp-1.21.tar.gz
         sha256: 3810e998308fba2e0f4f26043035032b027ce51ce5c8a52a8b8e340ca65f13e5
-        x-checker-data:
-          type: anitya
-          project-id: 3197
-          stable-only: true
-          url-template: https://cpan.metacpan.org/authors/id/W/WB/WBRASWELL/Parse-Yapp-$version.tar.gz
 
   - name: rpcsvc-proto
     cleanup:
       - '*'
     sources:
       - type: archive
+        # renovate: datasource=github-releases depName=thkukuk/rpcsvc-proto versioning=loose extractVersion=^v(?<version>.+)$ shape=double
         url: https://github.com/thkukuk/rpcsvc-proto/releases/download/v1.4.4/rpcsvc-proto-1.4.4.tar.xz
         sha256: 81c3aa27edb5d8a18ef027081ebb984234d5b5860c65bd99d4ac8f03145a558b
-        x-checker-data:
-          type: json
-          url: https://api.github.com/repos/thkukuk/rpcsvc-proto/releases/latest
-          version-query: .tag_name | sub("^v"; "")
-          url-query: '"https://github.com/thkukuk/rpcsvc-proto/releases/download/v"
-            + $version + "/rpcsvc-proto-" + $version + ".tar.xz"'
 
   - name: samba
     build-options:
@@ -283,13 +261,9 @@ modules:
       - --without-dmapi
     sources: &samba-sources
       - type: archive
+        # renovate: datasource=custom.html depName=samba packageName=https://samba.org/samba/ftp/stable/ versioning=loose extractVersion=^samba-(?<version>[\d.]+)\.tar\.gz$
         url: https://samba.org/samba/ftp/stable/samba-4.24.0.tar.gz
         sha256: 1b1e457fd651a612cd08226cc6efd04e5d01e36d918c8b4c4e470e74e86881ea
-        x-checker-data:
-          type: html
-          url: https://samba.org/samba/ftp/stable/
-          version-pattern: samba-([\d.]+)\.tar\.gz
-          url-template: https://samba.org/samba/ftp/stable/samba-$version.tar.gz
       - type: patch
         path: samba-skip-setuid-check.patch
 
@@ -316,13 +290,9 @@ modules:
     buildsystem: meson
     sources:
       - type: archive
+        # renovate: datasource=custom.html depName=zenity packageName=https://download.gnome.org/sources/zenity/3.44/ versioning=loose extractVersion=^zenity-(?<version>[\d.]+)\.tar\.xz$
         url: https://download.gnome.org/sources/zenity/3.44/zenity-3.44.5.tar.xz
         sha256: 29ac447f4246b1da783a3c28ddc80b0ef7c80eccd5836ad9140abf89841d0eab
-        x-checker-data:
-          type: gnome
-          name: zenity
-          versions:
-            <: '3.50'
 
   - name: 7zip
     buildsystem: simple
@@ -333,13 +303,9 @@ modules:
       - ln -s 7zz ${FLATPAK_DEST}/bin/7za
     sources:
       - type: file
-        url: https://7-zip.org/a/7z2600-linux-x64.tar.xz
+        # renovate: datasource=github-releases depName=7zip-linux packageName=ip7z/7zip versioning=loose
+        url: https://github.com/ip7z/7zip/releases/download/26.00/7z2600-linux-x64.tar.xz
         sha256: c74dc4a48492cde43f5fec10d53fb2a66f520e4a62a69d630c44cb22c477edc6
-        x-checker-data:
-          type: html
-          url: https://7-zip.org/download.html
-          version-pattern: 7z(\d+)-linux-x64\.tar\.xz
-          url-template: https://7-zip.org/a/7z$version-linux-x64.tar.xz
 
   # Flatpak bundle
 

@@ -18,13 +18,7 @@ modules:
       - cp -a wine-mono-* ${FLATPAK_DEST}/mono/
     sources:
       - type: archive
+        # renovate: datasource=custom.html depName=wine-mono-10.4 packageName=https://dl.winehq.org/wine/wine-mono/ versioning=loose extractVersion=^(?<version>10\.4\.\d+)/$ shape=double
         url: https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.tar.xz
         strip-components: 0
         sha256: a16606ef0724202e6a6848ece6e0cbba64d11e2f11aefe744af1d93c6d9f99bb
-        x-checker-data:
-          type: html
-          url: https://dl.winehq.org/wine/wine-mono/
-          versions:
-            "<": "10.5.0"
-          version-pattern: href="(10\.4\.\d+)/"
-          url-template: https://dl.winehq.org/wine/wine-mono/$version/wine-mono-$version-x86.tar.xz

@@ -32,18 +32,11 @@ modules:
       - ln -sf /app/share/wine/support/mono ${FLATPAK_DEST}/share/wine/mono
     sources:
       - type: archive
+        # renovate: datasource=custom.html depName=wine-10 packageName=https://dl.winehq.org/wine/source/10.x/ versioning=loose extractVersion=^wine-(?<version>\d+\.[\d.]+)\.tar\.xz$
         url: https://dl.winehq.org/wine/source/10.x/wine-10.20.tar.xz
         sha256: 81b4a153958f6247fe5041d5df65eadcbbeea1b6ba8cda24eb7e3d7ce2d1fe3c
         x-addons-url: >-
           https://gitlab.winehq.org/wine/wine/-/raw/master/dlls/appwiz.cpl/addons.c
-        x-checker-data:
-          type: html
-          url: https://dl.winehq.org/wine/source/10.x/
-          version-pattern: wine-(\d+\.[\d.]+)\.tar\.xz
-          url-template: https://dl.winehq.org/wine/source/10.x/wine-$version.tar.xz
-          versions:
-            <: '11.0'
-          is-main-source: true
 
   # Tools
 
