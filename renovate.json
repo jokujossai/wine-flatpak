@@ -3,6 +3,13 @@
   "extends": [
     "config:recommended"
   ],
+  "packageRules": [
+    {
+      "description": "7-Zip source build (winetricks) and Linux binary (base runtime) track the same upstream release",
+      "matchDepNames": ["ip7z/7zip", "7zip-linux"],
+      "groupName": "7zip"
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
