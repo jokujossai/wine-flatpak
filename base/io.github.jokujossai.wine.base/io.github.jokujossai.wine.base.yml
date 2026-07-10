@@ -262,8 +262,8 @@ modules:
     sources: &samba-sources
       - type: archive
         # renovate: datasource=custom.html depName=samba packageName=https://samba.org/samba/ftp/stable/ versioning=loose extractVersion=^samba-(?<version>[\d.]+)\.tar\.gz$
-        url: https://samba.org/samba/ftp/stable/samba-4.24.0.tar.gz
-        sha256: 1b1e457fd651a612cd08226cc6efd04e5d01e36d918c8b4c4e470e74e86881ea
+        url: https://samba.org/samba/ftp/stable/samba-4.24.4.tar.gz
+        sha256: df2c51ab4361ec626ab9988e5946efcca8465bc7afae834291d5558468265ff8
       - type: patch
         path: samba-skip-setuid-check.patch
 
