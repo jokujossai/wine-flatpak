@@ -26,14 +26,13 @@
     },
     {
       "customType": "regex",
-      "description": "Archive sources marked shape=double: the version occurs twice in the URL (directory and file name), so the whole url line is rebuilt.",
+      "description": "Archive sources marked shape=double: the version occurs twice in the URL (directory and file name); the default global auto-replace updates both occurrences.",
       "managerFilePatterns": [
         "/^(?:base|wine|extension|game)/.*\\.yml$/"
       ],
       "matchStrings": [
-        "(?<comment># renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: packageName=(?<packageName>\\S+))?(?: versioning=(?<versioning>\\S+))?(?: extractVersion=(?<extractVersion>\\S+))?(?: registryUrl=(?<registryUrl>\\S+))? shape=double)\\n(?<indent> +)url: (?<prefix>\\S+/v?)(?<currentValue>\\d[\\d.]*)(?<middle>/\\S+[-/]v?)\\d+\\.[\\d.]+(?<suffix>[-.]\\S+)\\n"
-      ],
-      "autoReplaceStringTemplate": "{{{comment}}}\n{{{indent}}}url: {{{prefix}}}{{{newValue}}}{{{middle}}}{{{newValue}}}{{{suffix}}}\n"
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: packageName=(?<packageName>\\S+))?(?: versioning=(?<versioning>\\S+))?(?: extractVersion=(?<extractVersion>\\S+))?(?: registryUrl=(?<registryUrl>\\S+))? shape=double\\n +url: \\S+/v?(?<currentValue>\\d[\\d.]*)/\\S+[-/]v?\\d+\\.[\\d.]+[-.]\\S+\\n"
+      ]
     },
     {
       "customType": "regex",
@@ -48,25 +47,34 @@
     },
     {
       "customType": "regex",
-      "description": "7-Zip Linux binary: release tag 26.00 maps to file name 7z2600-linux-x64.tar.xz.",
+      "description": "7-Zip Linux binary: release tag 26.00 maps to file name 7z2600-linux-x64.tar.xz. Fields are configured here because autoReplaceStringTemplate can only reference standard upgrade fields.",
       "managerFilePatterns": [
         "/^(?:base|wine|extension|game)/.*\\.yml$/"
       ],
       "matchStrings": [
-        "(?<comment># renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: packageName=(?<packageName>\\S+))?(?: versioning=(?<versioning>\\S+))?)\\n(?<indent> +)url: https://github\\.com/ip7z/7zip/releases/download/(?<currentValue>[\\d.]+)/7z\\d+-linux-x64\\.tar\\.xz\\n"
+        "url: https://github\\.com/ip7z/7zip/releases/download/(?<currentValue>[\\d.]+)/7z\\d+-linux-x64\\.tar\\.xz\\n"
       ],
-      "autoReplaceStringTemplate": "{{{comment}}}\n{{{indent}}}url: https://github.com/ip7z/7zip/releases/download/{{{newValue}}}/7z{{replace '\\.' '' newValue}}-linux-x64.tar.xz\n"
+      "depNameTemplate": "7zip-linux",
+      "packageNameTemplate": "ip7z/7zip",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "loose",
+      "autoReplaceStringTemplate": "url: https://github.com/ip7z/7zip/releases/download/{{{newValue}}}/7z{{replace '\\.' '' newValue}}-linux-x64.tar.xz\n"
     },
     {
       "customType": "regex",
-      "description": "krb5 (shape=truncated-dir): the URL directory component is the version truncated to major.minor.",
+      "description": "krb5: the URL directory component is the version truncated to major.minor. Fields are configured here because autoReplaceStringTemplate can only reference standard upgrade fields.",
       "managerFilePatterns": [
         "/^(?:base|wine|extension|game)/.*\\.yml$/"
       ],
       "matchStrings": [
-        "(?<comment># renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: packageName=(?<packageName>\\S+))?(?: versioning=(?<versioning>\\S+))?(?: extractVersion=(?<extractVersion>\\S+))? shape=truncated-dir)\\n(?<indent> +)url: https://kerberos\\.org/dist/krb5/[\\d.]+/krb5-(?<currentValue>[\\d.]+)\\.tar\\.gz\\n"
+        "url: https://kerberos\\.org/dist/krb5/[\\d.]+/krb5-(?<currentValue>[\\d.]+)\\.tar\\.gz\\n"
       ],
-      "autoReplaceStringTemplate": "{{{comment}}}\n{{{indent}}}url: https://kerberos.org/dist/krb5/{{replace '^(\\d+\\.\\d+).*' '$1' newValue}}/krb5-{{{newValue}}}.tar.gz\n"
+      "depNameTemplate": "krb5",
+      "packageNameTemplate": "krb5/krb5",
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "loose",
+      "extractVersionTemplate": "^krb5-(?<version>[\\d.]+)-final$",
+      "autoReplaceStringTemplate": "url: https://kerberos.org/dist/krb5/{{replace '^(\\d+\\.\\d+).*' '$1' newValue}}/krb5-{{{newValue}}}.tar.gz\n"
     }
   ],
   "customDatasources": {

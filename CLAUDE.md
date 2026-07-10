@@ -321,12 +321,16 @@ Manifest sources are updated by Renovate via regex custom managers
 `url:` line:
 
 ```yaml
-# renovate: datasource=<ds> depName=<name> [packageName=<pkg>] [versioning=<v>] [extractVersion=<re>] [registryUrl=<url>] [shape=double|truncated-dir]
+# renovate: datasource=<ds> depName=<name> [packageName=<pkg>] [versioning=<v>] [extractVersion=<re>] [registryUrl=<url>] [shape=double]
 ```
 
 - Attribute order is fixed (the managers match it literally)
 - `shape=double` marks URLs where the version occurs twice (directory + file
-  name); `shape=truncated-dir` is krb5's major.minor directory
+  name); the default global auto-replace updates both occurrences
+- krb5 and the 7-Zip Linux binary have dedicated managers in renovate.json
+  (their URLs need reshaping); their manifest comments are informational only.
+  `autoReplaceStringTemplate` can only reference standard upgrade fields such
+  as `newValue` - custom regex capture groups render as empty strings
 - `datasource=custom.html` treats `packageName` as an HTML index page URL;
   `extractVersion` picks versions out of the listed links
 - Renovate only bumps versions in `url:`/`tag:` lines; the `post-renovate`
