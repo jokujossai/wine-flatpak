@@ -10,8 +10,8 @@ config-opts:
 sources:
   - type: archive
     # renovate: datasource=gitlab-tags depName=libinput packageName=libinput/libinput versioning=loose extractVersion=^(?<version>\d+\.\d+\.\d+)$ registryUrl=https://gitlab.freedesktop.org shape=double
-    url: https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.31.0/libinput-1.31.0.tar.gz
-    sha256: 5f95a8ce039b3b2b4560a60bbdb920518d41baa9419344e5878c94bd841d5a54
+    url: https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.31.3/libinput-1.31.3.tar.gz
+    sha256: b6749bf6f1890f6631c0a70a027c35fec9d2e096a39f720548896e41474a9854
 cleanup:
   - /bin
   - /etc
