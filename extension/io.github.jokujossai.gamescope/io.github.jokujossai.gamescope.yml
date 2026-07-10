@@ -46,6 +46,8 @@ modules:
     config-opts:
       - -Dpipewire=enabled
       - -Dforce_fallback_for=stb,wlroots,libliftoff,vkroots
+      # Unit tests require catch2, which the runtime does not ship
+      - -Denable_tests=false
     sources:
       - type: git
         # renovate: datasource=github-tags depName=ValveSoftware/gamescope versioning=loose extractVersion=^(?<version>[\d.]+)$
