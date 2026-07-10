@@ -22,8 +22,8 @@ modules:
       - type: git
         # renovate: datasource=github-tags depName=ip7z/7zip versioning=loose extractVersion=^(?<version>[\d.]+)$
         url: https://github.com/ip7z/7zip.git
-        tag: '26.00'
-        commit: 839151eaaad24771892afaae6bac690e31e58384
+        tag: '26.02'
+        commit: f9d78aff31a5f2521ae7ddbdc97c4a8855808959
 
   - name: cabextract
     # Built from the libmspack git checkout, which - unlike the cabextract.org.uk
