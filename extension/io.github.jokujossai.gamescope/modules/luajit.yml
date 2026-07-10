@@ -9,8 +9,8 @@ sources:
   - type: git
     # renovate: datasource=github-tags depName=openresty/luajit2 versioning=loose extractVersion=^v(?<version>[\d.-]+)$
     url: https://github.com/openresty/luajit2.git
-    tag: v2.1-20260227
-    commit: 928290a470d35eb01324d5275b22fb86b13602a2
+    tag: v2.1-20260701
+    commit: 2802aafe24b7c3b2892e616c2bee97a61e9c026e
 cleanup:
   - /bin
   - /include
