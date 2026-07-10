@@ -106,7 +106,7 @@ jobs:
           cache: false
 
       - name: Upload base repo
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: base-repo
           path: repo/
@@ -188,7 +188,7 @@ jobs:
           echo "${GPG_PRIVATE_KEY}" | gpg --import --batch
 
       - name: Download base repo
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: base-repo
           path: base-repo/
@@ -235,7 +235,7 @@ jobs:
           cache: false
 
       - name: Upload component repo
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.name }}-repo
           path: repo/
@@ -270,7 +270,7 @@ jobs:
           echo "${GPG_PRIVATE_KEY}" | gpg --import --batch
 
       - name: Download all component repos
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: '*-repo'
           path: components/
@@ -358,7 +358,7 @@ jobs:
 
       - name: Upload repository artifact
         if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: flatpak-repo
           path: repo/
@@ -398,7 +398,7 @@ jobs:
     steps:
       - name: Download flatpak artifacts
         if: github.ref_type == 'tag'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: "*.flatpak"
           merge-multiple: true
