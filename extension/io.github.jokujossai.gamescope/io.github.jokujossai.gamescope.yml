@@ -52,8 +52,8 @@ modules:
       - type: git
         # renovate: datasource=github-tags depName=ValveSoftware/gamescope versioning=loose extractVersion=^(?<version>[\d.]+)$
         url: https://github.com/ValveSoftware/gamescope.git
-        commit: 6ea6b21e83a3077d60ee5ab044b472dfc399189d
-        tag: 3.16.24
+        commit: 17baf4abd1ab3353fb705e4d0d023f84e870f7e8
+        tag: 3.16.25
 
       - type: patch
         path: fix-process-cleanup.patch
