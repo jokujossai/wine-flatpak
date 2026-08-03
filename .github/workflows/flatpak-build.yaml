@@ -47,12 +47,16 @@ jobs:
         run: |
           echo "message=$(git log -1 --pretty=%s)" >> "$GITHUB_OUTPUT"
           echo "author=$(git log -1 --pretty='%an <%ae>')" >> "$GITHUB_OUTPUT"
+          echo "author_name=$(git log -1 --pretty=%an)" >> "$GITHUB_OUTPUT"
+          echo "author_email=$(git log -1 --pretty=%ae)" >> "$GITHUB_OUTPUT"
 
       - name: Amend Renovate commit
         id: commit
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_author: ${{ steps.last-commit.outputs.author }}
+          commit_user_name: ${{ steps.last-commit.outputs.author_name }}
+          commit_user_email: ${{ steps.last-commit.outputs.author_email }}
           commit_message: ${{ steps.last-commit.outputs.message }}
           commit_options: '--amend --no-edit'
           push_options: '--force'
