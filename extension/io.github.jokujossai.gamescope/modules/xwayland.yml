@@ -5,8 +5,8 @@ config-opts:
 sources:
   - type: archive
     # renovate: datasource=custom.html depName=xwayland packageName=https://xorg.freedesktop.org/archive/individual/xserver/ versioning=loose extractVersion=^xwayland-(?<version>[\d.]+)\.tar\.xz$
-    url: https://xorg.freedesktop.org/archive/individual/xserver/xwayland-24.1.13.tar.xz
-    sha256: 173aea3d6f79609164c04528e1c8e4c9b60fcd59391c3c9dad4667297d727fb6
+    url: https://xorg.freedesktop.org/archive/individual/xserver/xwayland-26.0.99.901.tar.xz
+    sha256: 9d5fc0dfec66e210d5df81cf9fe950bfba685613f448c63941102076412a3a47
 cleanup:
   - /lib/xorg
   - /lib/pkgconfig
