@@ -13,6 +13,11 @@
       "description": "Xorg tarballs numbered X.0.99.90N are release candidates for X.1.0 (e.g. 24.0.99.901 preceded 24.1.0). The custom.html datasource has no notion of stability, so filter them out here.",
       "matchDepNames": ["xwayland"],
       "allowedVersions": "!/\\.99\\./"
+    },
+    {
+      "description": "libinput/libei/libevdev prereleases are numbered .901/.902/.903 in the last component (libinput 1.30.901 preceded 1.31.0). versioning=loose sorts them above the stable release they precede, so filter them out here.",
+      "matchDepNames": ["libinput", "libei", "libevdev"],
+      "allowedVersions": "!/\\.9\\d\\d(?:\\.|$)/"
     }
   ],
   "customManagers": [
